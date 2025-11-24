@@ -1,0 +1,30 @@
+# LangChain & LangGraph
+langchain
+langchain-openai
+langgraph
+langchain-community
+
+# Vector DB & Embeddings
+chromadb
+sentence-transformers
+
+# API & Web
+fastapi[standard]
+uvicorn[standard]
+gradio
+python-dotenv
+
+# Google Search
+google-api-python-client
+
+# Reddit API (선택사항)
+praw
+
+# Utilities
+pydantic
+python-multipart
+requests
+
+# Testing
+pytest
+pytest-asyncio
