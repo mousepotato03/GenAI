@@ -1,0 +1,224 @@
+{
+  "tools": [
+    {
+      "name": "ChatGPT",
+      "category": "text-generation",
+      "description": "OpenAI의 대화형 AI 언어 모델로 텍스트 생성, 번역, 코딩 지원 등 다양한 작업 수행",
+      "features": ["대화형 인터페이스", "코드 생성", "문서 작성", "번역", "데이터 분석"],
+      "pricing": "무료/유료 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://chat.openai.com",
+      "tags": ["chatbot", "text generation", "coding", "writing"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Claude",
+      "category": "text-generation",
+      "description": "Anthropic의 AI 어시스턴트로 긴 문맥 처리와 안전한 대화에 특화",
+      "features": ["긴 문맥 처리 (200K 토큰)", "문서 분석", "코딩 지원", "윤리적 AI"],
+      "pricing": "무료/유료 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://claude.ai",
+      "tags": ["chatbot", "document analysis", "coding", "long context"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Gemini",
+      "category": "text-generation",
+      "description": "Google의 멀티모달 AI 모델로 텍스트, 이미지, 코드를 통합 처리",
+      "features": ["멀티모달 입력", "Google 서비스 연동", "코드 생성", "이미지 분석"],
+      "pricing": "무료/유료 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://gemini.google.com",
+      "tags": ["multimodal", "google", "coding", "image analysis"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Midjourney",
+      "category": "image-generation",
+      "description": "Discord 기반의 AI 이미지 생성 도구로 예술적이고 창의적인 이미지 생성에 특화",
+      "features": ["텍스트-이미지 생성", "스타일 변환", "이미지 업스케일링", "배리에이션 생성"],
+      "pricing": "유료 ($10-60/월)",
+      "monthly_price": 30,
+      "url": "https://midjourney.com",
+      "tags": ["image generation", "art", "creative", "discord"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "DALL-E 3",
+      "category": "image-generation",
+      "description": "OpenAI의 최신 이미지 생성 AI로 텍스트 프롬프트를 정확히 이해하여 이미지 생성",
+      "features": ["정확한 프롬프트 이해", "텍스트 렌더링", "ChatGPT 통합", "안전 필터링"],
+      "pricing": "ChatGPT Plus 포함 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://openai.com/dall-e-3",
+      "tags": ["image generation", "openai", "text-to-image"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Stable Diffusion",
+      "category": "image-generation",
+      "description": "오픈소스 AI 이미지 생성 모델로 로컬 실행 및 커스터마이징 가능",
+      "features": ["오픈소스", "로컬 실행 가능", "LoRA/ControlNet 지원", "커스텀 모델"],
+      "pricing": "무료 (오픈소스)",
+      "monthly_price": 0,
+      "url": "https://stability.ai",
+      "tags": ["image generation", "open source", "customizable", "local"],
+      "updated_at": "2024-10-01"
+    },
+    {
+      "name": "Sora",
+      "category": "video-generation",
+      "description": "OpenAI의 텍스트-비디오 생성 AI로 고품질 동영상 제작 가능",
+      "features": ["텍스트-비디오 생성", "최대 1분 영상", "다양한 스타일", "카메라 움직임 제어"],
+      "pricing": "ChatGPT Plus 포함 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://openai.com/sora",
+      "tags": ["video generation", "text-to-video", "openai"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Runway",
+      "category": "video-generation",
+      "description": "AI 기반 비디오 편집 및 생성 플랫폼으로 전문적인 영상 제작 지원",
+      "features": ["Gen-2 비디오 생성", "이미지-비디오 변환", "모션 브러시", "배경 제거"],
+      "pricing": "유료 ($15-95/월)",
+      "monthly_price": 35,
+      "url": "https://runwayml.com",
+      "tags": ["video generation", "video editing", "professional"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "Pika",
+      "category": "video-generation",
+      "description": "간편한 AI 비디오 생성 도구로 텍스트나 이미지에서 짧은 동영상 생성",
+      "features": ["텍스트-비디오", "이미지-비디오", "비디오 편집", "립싱크"],
+      "pricing": "무료/유료 ($8-58/월)",
+      "monthly_price": 28,
+      "url": "https://pika.art",
+      "tags": ["video generation", "easy to use", "creative"],
+      "updated_at": "2024-10-01"
+    },
+    {
+      "name": "ElevenLabs",
+      "category": "audio-generation",
+      "description": "AI 음성 합성 및 복제 플랫폼으로 자연스러운 TTS와 음성 클로닝 제공",
+      "features": ["텍스트-음성 변환", "음성 복제", "다국어 지원", "감정 표현"],
+      "pricing": "무료/유료 ($5-330/월)",
+      "monthly_price": 22,
+      "url": "https://elevenlabs.io",
+      "tags": ["voice synthesis", "TTS", "voice cloning", "dubbing"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Suno",
+      "category": "audio-generation",
+      "description": "AI 음악 생성 플랫폼으로 텍스트 프롬프트로 노래 및 배경음악 생성",
+      "features": ["텍스트-음악 생성", "가사 포함 노래", "다양한 장르", "커스텀 스타일"],
+      "pricing": "무료/유료 ($10-30/월)",
+      "monthly_price": 10,
+      "url": "https://suno.ai",
+      "tags": ["music generation", "AI music", "song creation"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "GitHub Copilot",
+      "category": "code-generation",
+      "description": "GitHub과 OpenAI의 AI 코딩 어시스턴트로 코드 자동 완성 및 생성",
+      "features": ["코드 자동 완성", "함수 생성", "코드 설명", "다양한 언어 지원"],
+      "pricing": "유료 ($10-19/월)",
+      "monthly_price": 19,
+      "url": "https://github.com/features/copilot",
+      "tags": ["coding assistant", "autocomplete", "IDE integration"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Cursor",
+      "category": "code-generation",
+      "description": "AI 네이티브 코드 에디터로 GPT-4 기반의 강력한 코딩 지원 제공",
+      "features": ["AI 코드 편집", "자연어 코딩", "코드베이스 이해", "멀티파일 편집"],
+      "pricing": "무료/유료 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://cursor.sh",
+      "tags": ["code editor", "AI IDE", "coding assistant"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "Notion AI",
+      "category": "productivity",
+      "description": "Notion에 통합된 AI 어시스턴트로 문서 작성, 요약, 번역 등 지원",
+      "features": ["문서 요약", "글쓰기 지원", "번역", "브레인스토밍"],
+      "pricing": "유료 ($10/월, Notion 추가 기능)",
+      "monthly_price": 10,
+      "url": "https://notion.so/product/ai",
+      "tags": ["productivity", "writing", "documentation", "notion"],
+      "updated_at": "2024-10-01"
+    },
+    {
+      "name": "Canva AI",
+      "category": "design",
+      "description": "Canva의 AI 디자인 도구로 이미지 생성, 배경 제거, 매직 리사이즈 등 제공",
+      "features": ["Magic Design", "텍스트-이미지", "배경 제거", "매직 리사이즈"],
+      "pricing": "무료/유료 ($13/월)",
+      "monthly_price": 13,
+      "url": "https://canva.com",
+      "tags": ["design", "graphic design", "templates", "easy to use"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "Perplexity AI",
+      "category": "research",
+      "description": "AI 기반 검색 엔진으로 실시간 웹 검색과 소스 인용을 결합한 답변 제공",
+      "features": ["실시간 웹 검색", "소스 인용", "후속 질문", "학술 검색 모드"],
+      "pricing": "무료/유료 ($20/월)",
+      "monthly_price": 20,
+      "url": "https://perplexity.ai",
+      "tags": ["search engine", "research", "citations", "real-time"],
+      "updated_at": "2024-11-01"
+    },
+    {
+      "name": "HeyGen",
+      "category": "video-generation",
+      "description": "AI 아바타 기반 비디오 생성 플랫폼으로 가상 발표자 영상 제작",
+      "features": ["AI 아바타", "텍스트-비디오", "다국어 더빙", "커스텀 아바타"],
+      "pricing": "유료 ($24-180/월)",
+      "monthly_price": 48,
+      "url": "https://heygen.com",
+      "tags": ["avatar", "video generation", "presentation", "dubbing"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "D-ID",
+      "category": "video-generation",
+      "description": "사진을 말하는 아바타로 변환하는 AI 플랫폼",
+      "features": ["사진-비디오 변환", "AI 아바타", "립싱크", "다국어 지원"],
+      "pricing": "유료 ($6-300/월)",
+      "monthly_price": 30,
+      "url": "https://d-id.com",
+      "tags": ["avatar", "talking photo", "video generation"],
+      "updated_at": "2024-10-01"
+    },
+    {
+      "name": "Leonardo AI",
+      "category": "image-generation",
+      "description": "게임 에셋 및 크리에이티브 콘텐츠 생성에 특화된 AI 이미지 플랫폼",
+      "features": ["게임 에셋 생성", "일관된 캐릭터", "실시간 생성", "모션 생성"],
+      "pricing": "무료/유료 ($12-60/월)",
+      "monthly_price": 24,
+      "url": "https://leonardo.ai",
+      "tags": ["image generation", "game assets", "creative", "consistent characters"],
+      "updated_at": "2024-10-15"
+    },
+    {
+      "name": "Synthesia",
+      "category": "video-generation",
+      "description": "AI 아바타를 활용한 교육 및 마케팅 비디오 생성 플랫폼",
+      "features": ["140+ AI 아바타", "120+ 언어", "화면 녹화 통합", "커스텀 아바타"],
+      "pricing": "유료 ($29-89/월)",
+      "monthly_price": 59,
+      "url": "https://synthesia.io",
+      "tags": ["video generation", "training videos", "marketing", "avatar"],
+      "updated_at": "2024-10-01"
+    }
+  ]
+}
