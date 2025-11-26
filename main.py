@@ -205,9 +205,9 @@ async def approve_plan(request: ApproveRequest):
 def create_gradio_ui():
     """Gradio 채팅 인터페이스 생성"""
 
-    # 상태 변수
-    current_thread_id = gr.State(None)
-    current_plan = gr.State(None)
+    # # 상태 변수
+    # current_thread_id = gr.State(None)
+    # current_plan = gr.State(None)
 
     def chat_start(message: str, history: list, user_id: str):
         """채팅 시작 - Plan 생성"""
@@ -301,6 +301,10 @@ def create_gradio_ui():
     with gr.Blocks(
         title="AI 101 - AI 도구 추천 에이전트"
     ) as demo:
+        
+        # 상태 변수
+        current_thread_id = gr.State(None)
+        current_plan = gr.State(None)
 
         gr.Markdown("""
         # 🤖 AI 101 - 지능형 AI 도구 추천 에이전트
