@@ -1,0 +1,635 @@
+{
+  "tools": [
+    {
+      "name": "ChatGPT",
+      "category": "text-generation",
+      "description": "OpenAI의 대화형 AI 언어 모델로 텍스트 생성, 번역, 코딩 지원 등 다양한 작업 수행",
+      "features": [
+        "대화형 인터페이스",
+        "코드 생성",
+        "문서 작성",
+        "번역",
+        "데이터 분석",
+        "이미지 생성 (DALL-E 3)"
+      ],
+      "pricing": "무료/유료 ($20/월 Plus, $200/월 Pro)",
+      "monthly_price": 20,
+      "url": "https://chat.openai.com",
+      "tags": [
+        "chatbot",
+        "text generation",
+        "coding",
+        "writing",
+        "image generation"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Claude",
+      "category": "text-generation",
+      "description": "Anthropic의 AI 어시스턴트로 긴 문맥 처리와 안전한 대화에 특화",
+      "features": [
+        "긴 문맥 처리 (200K 토큰)",
+        "문서 분석",
+        "코딩 지원",
+        "윤리적 AI",
+        "아티팩트 생성"
+      ],
+      "pricing": "무료/유료 ($20/월 Pro)",
+      "monthly_price": 20,
+      "url": "https://claude.ai",
+      "tags": ["chatbot", "document analysis", "coding", "long context"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Gemini",
+      "category": "text-generation",
+      "description": "Google의 AI 어시스턴트로 Google 서비스와 통합되어 멀티모달 기능 제공",
+      "features": [
+        "멀티모달 처리",
+        "Google 서비스 통합",
+        "실시간 정보 검색",
+        "이미지 생성"
+      ],
+      "pricing": "무료/유료 ($19.99/월 Pro, $249.99/월 Ultra)",
+      "monthly_price": 19.99,
+      "url": "https://gemini.google.com",
+      "tags": ["chatbot", "multimodal", "google integration", "search"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Perplexity",
+      "category": "ai-search",
+      "description": "AI 기반 검색 엔진으로 실시간 정보 검색과 출처 인용 기능 제공",
+      "features": [
+        "실시간 웹 검색",
+        "출처 인용",
+        "다양한 AI 모델 접근",
+        "파일 분석",
+        "API 지원"
+      ],
+      "pricing": "무료/유료 ($20/월 Pro, $200/월 Max, $40/월 Enterprise)",
+      "monthly_price": 20,
+      "url": "https://perplexity.ai",
+      "tags": ["search engine", "research", "citations", "fact-checking"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Grok",
+      "category": "text-generation",
+      "description": "xAI의 AI 챗봇으로 실시간 정보와 유머러스한 응답 제공",
+      "features": ["실시간 정보 접근", "X(Twitter) 통합", "유머러스한 응답"],
+      "pricing": "X Premium 구독 필요",
+      "monthly_price": 0,
+      "url": "https://x.ai",
+      "tags": ["chatbot", "realtime", "twitter integration"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "DeepSeek",
+      "category": "text-generation",
+      "description": "중국 기반 AI 모델로 강력한 추론 능력과 코딩 지원 제공",
+      "features": ["강력한 추론 능력", "코딩 지원", "오픈소스 모델"],
+      "pricing": "무료/API 사용량 기반",
+      "monthly_price": 0,
+      "url": "https://deepseek.com",
+      "tags": ["chatbot", "reasoning", "coding", "open source"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "GitHub Copilot",
+      "category": "coding-assistant",
+      "description": "GitHub과 OpenAI가 개발한 AI 코딩 어시스턴트로 코드 자동완성 및 생성 제공",
+      "features": [
+        "코드 자동완성",
+        "다양한 언어 지원",
+        "IDE 통합",
+        "코드 설명",
+        "테스트 생성"
+      ],
+      "pricing": "무료/유료 ($10/월 Pro, $39/월 Pro+, $19/월 Business)",
+      "monthly_price": 10,
+      "url": "https://github.com/features/copilot",
+      "tags": ["coding", "autocomplete", "IDE integration", "developer tools"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Cursor",
+      "category": "coding-assistant",
+      "description": "AI 네이티브 코드 에디터로 GPT-4 기반의 강력한 코딩 지원 제공",
+      "features": [
+        "AI 코드 편집",
+        "자연어로 코드 생성",
+        "코드베이스 이해",
+        "멀티파일 편집"
+      ],
+      "pricing": "무료/유료 ($20/월 Pro, $40/월 Teams, $200/월 Ultra)",
+      "monthly_price": 20,
+      "url": "https://cursor.com",
+      "tags": ["IDE", "coding", "AI editor", "code generation"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Windsurf (Codeium)",
+      "category": "coding-assistant",
+      "description": "AI 기반 IDE로 에이전트 모드와 강력한 코드 어시스턴트 기능 제공",
+      "features": [
+        "코드 자동완성",
+        "에이전트 모드",
+        "멀티파일 편집",
+        "코드 검색"
+      ],
+      "pricing": "무료/유료 ($15/월 Pro, $30/월 Teams)",
+      "monthly_price": 15,
+      "url": "https://codeium.com/windsurf",
+      "tags": ["IDE", "coding", "agent mode", "autocomplete"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Tabnine",
+      "category": "coding-assistant",
+      "description": "AI 코드 어시스턴트로 프라이버시 중심의 코드 자동완성 제공",
+      "features": [
+        "코드 자동완성",
+        "25+ 언어 지원",
+        "프라이버시 보호",
+        "온프레미스 배포 가능"
+      ],
+      "pricing": "무료/유료 ($9/월 Dev, $39/월 Enterprise)",
+      "monthly_price": 9,
+      "url": "https://tabnine.com",
+      "tags": ["coding", "autocomplete", "privacy", "enterprise"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Amazon Q Developer",
+      "category": "coding-assistant",
+      "description": "AWS의 AI 코딩 어시스턴트로 AWS 서비스와 통합된 개발 지원 제공",
+      "features": ["AWS 통합", "코드 변환", "보안 스캔", "자연어 쿼리"],
+      "pricing": "무료/유료 ($19/월 Pro)",
+      "monthly_price": 19,
+      "url": "https://aws.amazon.com/q/developer/",
+      "tags": ["coding", "AWS", "cloud development", "security"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Midjourney",
+      "category": "image-generation",
+      "description": "고품질 AI 이미지 생성 도구로 예술적이고 스타일리시한 이미지 생성에 특화",
+      "features": [
+        "고품질 이미지 생성",
+        "다양한 스타일",
+        "상업적 사용권",
+        "Discord 통합"
+      ],
+      "pricing": "유료 ($10/월 Basic, $30/월 Standard, $60/월 Pro)",
+      "monthly_price": 10,
+      "url": "https://midjourney.com",
+      "tags": ["image generation", "art", "creative", "design"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "DALL-E 3",
+      "category": "image-generation",
+      "description": "OpenAI의 이미지 생성 모델로 텍스트 프롬프트를 정확하게 이해하여 이미지 생성",
+      "features": ["정확한 프롬프트 이해", "텍스트 렌더링", "ChatGPT 통합"],
+      "pricing": "ChatGPT Plus 포함 ($20/월) / API 사용량 기반 ($0.016/이미지~)",
+      "monthly_price": 20,
+      "url": "https://openai.com/dall-e-3",
+      "tags": ["image generation", "text-to-image", "OpenAI"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Stable Diffusion",
+      "category": "image-generation",
+      "description": "오픈소스 이미지 생성 모델로 로컬 설치 및 커스터마이징 가능",
+      "features": ["오픈소스", "로컬 실행 가능", "커스터마이징", "다양한 모델"],
+      "pricing": "무료 (오픈소스) / DreamStudio $10/1000 크레딧",
+      "monthly_price": 0,
+      "url": "https://stability.ai",
+      "tags": ["image generation", "open source", "customizable", "local"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Adobe Firefly",
+      "category": "image-generation",
+      "description": "Adobe의 생성형 AI로 상업적 사용이 안전한 이미지 생성 및 편집 제공",
+      "features": ["상업적 안전성", "Adobe 통합", "이미지 편집", "텍스트 효과"],
+      "pricing": "무료 25 크레딧/월 / 유료 ($4.99/월 100 크레딧, $19.99/월 Photoshop 포함)",
+      "monthly_price": 4.99,
+      "url": "https://firefly.adobe.com",
+      "tags": ["image generation", "commercial safe", "Adobe", "editing"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Ideogram",
+      "category": "image-generation",
+      "description": "텍스트 렌더링에 특화된 AI 이미지 생성 도구",
+      "features": ["정확한 텍스트 렌더링", "로고 생성", "타이포그래피"],
+      "pricing": "무료/유료 ($8/월~)",
+      "monthly_price": 8,
+      "url": "https://ideogram.ai",
+      "tags": ["image generation", "text rendering", "typography", "logos"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Runway",
+      "category": "video-generation",
+      "description": "AI 비디오 생성 및 편집 플랫폼으로 Gen-4 모델 제공",
+      "features": [
+        "텍스트-비디오 생성",
+        "이미지-비디오 변환",
+        "비디오 편집",
+        "모션 브러시"
+      ],
+      "pricing": "무료 125 크레딧 / 유료 ($12/월 Standard, $28/월 Pro, $76/월 Unlimited)",
+      "monthly_price": 12,
+      "url": "https://runwayml.com",
+      "tags": [
+        "video generation",
+        "video editing",
+        "text-to-video",
+        "creative"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Sora (OpenAI)",
+      "category": "video-generation",
+      "description": "OpenAI의 텍스트-비디오 생성 모델로 고품질 비디오 생성",
+      "features": ["텍스트-비디오", "고품질 생성", "물리 시뮬레이션"],
+      "pricing": "ChatGPT Plus/Pro 포함 ($20~$200/월)",
+      "monthly_price": 20,
+      "url": "https://openai.com/sora",
+      "tags": ["video generation", "text-to-video", "OpenAI", "high quality"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Google Veo",
+      "category": "video-generation",
+      "description": "Google의 AI 비디오 생성 모델로 네이티브 오디오 생성 지원",
+      "features": ["텍스트-비디오", "네이티브 오디오", "고품질 1080p"],
+      "pricing": "Google AI Pro 포함 ($19.99/월 Pro, $249.99/월 Ultra)",
+      "monthly_price": 19.99,
+      "url": "https://deepmind.google/technologies/veo/",
+      "tags": ["video generation", "Google", "native audio", "high quality"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Luma Dream Machine",
+      "category": "video-generation",
+      "description": "고품질 3D 환경과 리얼리즘에 특화된 AI 비디오 생성 도구",
+      "features": ["텍스트-비디오", "이미지-비디오", "3D 환경 생성"],
+      "pricing": "무료/유료 ($9.99/월 Lite, $29.99/월 Plus)",
+      "monthly_price": 9.99,
+      "url": "https://lumalabs.ai",
+      "tags": ["video generation", "3D", "realistic", "creative"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Synthesia",
+      "category": "video-generation",
+      "description": "AI 아바타를 활용한 비디오 생성 플랫폼으로 기업용 비디오 제작에 특화",
+      "features": ["AI 아바타", "다국어 지원", "기업용 비디오", "템플릿"],
+      "pricing": "유료 ($19/월 Starter, $29/월 Professional)",
+      "monthly_price": 19,
+      "url": "https://synthesia.io",
+      "tags": ["video generation", "avatar", "enterprise", "training videos"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "ElevenLabs",
+      "category": "voice-generation",
+      "description": "초현실적 AI 음성 생성 및 음성 복제 플랫폼",
+      "features": ["음성 복제", "다국어 지원 (30+)", "감정 표현", "API 지원"],
+      "pricing": "무료 10K 문자 / 유료 ($5/월 Starter, $22/월 Creator, $99/월 Pro)",
+      "monthly_price": 5,
+      "url": "https://elevenlabs.io",
+      "tags": [
+        "voice generation",
+        "voice cloning",
+        "text-to-speech",
+        "realistic"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Murf AI",
+      "category": "voice-generation",
+      "description": "AI 음성 생성 스튜디오로 다양한 음성과 비디오 편집 기능 제공",
+      "features": [
+        "120+ AI 음성",
+        "20+ 언어",
+        "음성 복제",
+        "비디오 편집기 내장"
+      ],
+      "pricing": "무료 10분 / 유료 ($19/월 Creator, $66/월 Business)",
+      "monthly_price": 19,
+      "url": "https://murf.ai",
+      "tags": ["voice generation", "studio", "video editing", "multilingual"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Suno",
+      "category": "music-generation",
+      "description": "AI 음악 생성 플랫폼으로 텍스트 프롬프트로 완전한 노래 생성",
+      "features": ["텍스트-음악", "보컬 생성", "다양한 장르", "Song Editor"],
+      "pricing": "무료 50 크레딧/일 / 유료 ($10/월 Pro, $30/월 Premier)",
+      "monthly_price": 10,
+      "url": "https://suno.com",
+      "tags": ["music generation", "AI music", "vocals", "creative"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Udio",
+      "category": "music-generation",
+      "description": "고품질 AI 음악 생성 도구로 다양한 스타일의 음악 생성",
+      "features": ["텍스트-음악", "고품질 오디오", "다양한 장르"],
+      "pricing": "무료 10/일 / 유료 ($10/월 Standard, $30/월 Pro)",
+      "monthly_price": 10,
+      "url": "https://udio.com",
+      "tags": ["music generation", "AI music", "high quality", "creative"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Zapier",
+      "category": "automation",
+      "description": "8,000+ 앱 연동 자동화 플랫폼으로 노코드 워크플로우 구축",
+      "features": [
+        "8,000+ 앱 연동",
+        "AI 자동화 빌더",
+        "멀티스텝 워크플로우",
+        "AI 챗봇"
+      ],
+      "pricing": "무료 100 태스크/월 / 유료 ($19.99/월 Starter, $49/월 Professional)",
+      "monthly_price": 19.99,
+      "url": "https://zapier.com",
+      "tags": ["automation", "workflow", "no-code", "integrations"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Make (Integromat)",
+      "category": "automation",
+      "description": "비주얼 자동화 플랫폼으로 복잡한 워크플로우 구축 가능",
+      "features": ["비주얼 빌더", "조건부 로직", "에러 핸들링", "다양한 연동"],
+      "pricing": "무료 1,000 ops/월 / 유료 (€9/월 Core, €16/월 Pro)",
+      "monthly_price": 9,
+      "url": "https://make.com",
+      "tags": ["automation", "workflow", "visual builder", "integrations"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "n8n",
+      "category": "automation",
+      "description": "오픈소스 자동화 플랫폼으로 셀프호스팅 및 AI 워크플로우 지원",
+      "features": ["오픈소스", "셀프호스팅 가능", "AI 워크플로우", "코드 노드"],
+      "pricing": "무료 (셀프호스트) / 클라우드 ($20/월~)",
+      "monthly_price": 0,
+      "url": "https://n8n.io",
+      "tags": ["automation", "open source", "self-hosted", "AI workflow"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Notion AI",
+      "category": "productivity",
+      "description": "올인원 워크스페이스에 AI 어시스턴트가 통합된 생산성 도구",
+      "features": ["AI 글쓰기 지원", "요약", "번역", "데이터베이스", "협업"],
+      "pricing": "무료/유료 ($10/월 Plus, $18/월 Business, AI 추가 $8/월)",
+      "monthly_price": 10,
+      "url": "https://notion.so",
+      "tags": [
+        "productivity",
+        "notes",
+        "workspace",
+        "AI writing",
+        "collaboration"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Obsidian",
+      "category": "productivity",
+      "description": "로컬 기반 마크다운 노트 앱으로 지식 그래프와 플러그인 생태계 제공",
+      "features": ["로컬 저장", "백링크", "지식 그래프", "플러그인 생태계"],
+      "pricing": "무료 (개인) / Sync $10/월, Publish $20/월",
+      "monthly_price": 0,
+      "url": "https://obsidian.md",
+      "tags": ["notes", "knowledge management", "local", "markdown", "graph"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "NotebookLM",
+      "category": "research",
+      "description": "Google의 AI 연구 도구로 문서 분석 및 팟캐스트 스타일 요약 생성",
+      "features": [
+        "문서 분석",
+        "AI 요약",
+        "오디오 오버뷰 생성",
+        "출처 기반 대화"
+      ],
+      "pricing": "무료 / Google One AI Premium 포함 ($19.99/월)",
+      "monthly_price": 0,
+      "url": "https://notebooklm.google",
+      "tags": ["research", "document analysis", "AI summary", "audio overview"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Fireflies.ai",
+      "category": "meeting-assistant",
+      "description": "AI 미팅 어시스턴트로 자동 전사, 요약 및 액션 아이템 추출",
+      "features": [
+        "자동 전사",
+        "AI 요약",
+        "액션 아이템",
+        "CRM 연동",
+        "다국어 지원"
+      ],
+      "pricing": "무료 800분 / 유료 ($10/월 Pro, $19/월 Business, $39/월 Enterprise)",
+      "monthly_price": 10,
+      "url": "https://fireflies.ai",
+      "tags": ["meeting", "transcription", "AI notes", "summary", "CRM"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Otter.ai",
+      "category": "meeting-assistant",
+      "description": "실시간 전사 및 미팅 노트 자동화 도구",
+      "features": [
+        "실시간 전사",
+        "화자 구분",
+        "협업 기능",
+        "Zoom/Meet/Teams 통합"
+      ],
+      "pricing": "무료 300분/월 / 유료 ($8.33/월 Pro, $20/월 Business)",
+      "monthly_price": 8.33,
+      "url": "https://otter.ai",
+      "tags": ["meeting", "transcription", "real-time", "collaboration"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Fathom",
+      "category": "meeting-assistant",
+      "description": "무료 AI 미팅 어시스턴트로 고품질 요약 및 하이라이트 클립 제공",
+      "features": [
+        "무료 무제한 녹음",
+        "AI 요약",
+        "하이라이트 클립",
+        "CRM 연동"
+      ],
+      "pricing": "무료 / 유료 ($19/월 Premium, $14/월 Team)",
+      "monthly_price": 0,
+      "url": "https://fathom.video",
+      "tags": ["meeting", "transcription", "free", "highlights", "summary"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Canva",
+      "category": "design",
+      "description": "AI 기능이 통합된 올인원 디자인 플랫폼",
+      "features": [
+        "Magic Design AI",
+        "템플릿",
+        "이미지 생성",
+        "비디오 편집",
+        "협업"
+      ],
+      "pricing": "무료 / 유료 ($12.99/월 Pro, $14.99/월 Teams)",
+      "monthly_price": 12.99,
+      "url": "https://canva.com",
+      "tags": [
+        "design",
+        "templates",
+        "AI generation",
+        "collaboration",
+        "easy-to-use"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Figma",
+      "category": "design",
+      "description": "협업 UI/UX 디자인 도구로 Figma AI 기능 포함",
+      "features": [
+        "실시간 협업",
+        "프로토타이핑",
+        "Figma AI",
+        "플러그인",
+        "Dev Mode"
+      ],
+      "pricing": "무료 / 유료 ($12/월 Professional)",
+      "monthly_price": 12,
+      "url": "https://figma.com",
+      "tags": ["design", "UI/UX", "prototyping", "collaboration", "developer"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Gamma",
+      "category": "presentation",
+      "description": "AI 기반 프레젠테이션 생성 도구로 빠른 슬라이드 제작",
+      "features": [
+        "AI 프레젠테이션 생성",
+        "문서/웹사이트 생성",
+        "템플릿",
+        "브랜드 키트"
+      ],
+      "pricing": "무료 400 크레딧 / 유료 ($10/월 Plus, $20/월 Pro)",
+      "monthly_price": 10,
+      "url": "https://gamma.app",
+      "tags": ["presentation", "AI generation", "slides", "documents"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Descript",
+      "category": "video-editing",
+      "description": "텍스트 기반 비디오/오디오 편집 도구로 AI 기능 통합",
+      "features": [
+        "텍스트 기반 편집",
+        "전사",
+        "오버덥 (음성 복제)",
+        "스튜디오 사운드",
+        "필러 워드 제거"
+      ],
+      "pricing": "무료 1시간 / 유료 ($16/월 Hobbyist, $24/월 Creator, $50/월 Business)",
+      "monthly_price": 16,
+      "url": "https://descript.com",
+      "tags": [
+        "video editing",
+        "audio editing",
+        "transcription",
+        "text-based editing"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "DeepL",
+      "category": "translation",
+      "description": "고품질 신경망 기반 번역 서비스로 자연스러운 번역 제공",
+      "features": ["31개 언어 지원", "문서 번역", "용어집", "API 지원"],
+      "pricing": "무료 제한적 / 유료 ($8.74/월 Starter, $28.74/월 Advanced)",
+      "monthly_price": 8.74,
+      "url": "https://deepl.com",
+      "tags": ["translation", "high quality", "documents", "API"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Grammarly",
+      "category": "writing",
+      "description": "AI 글쓰기 어시스턴트로 문법, 스타일, 톤 교정 제공",
+      "features": [
+        "문법 교정",
+        "스타일 제안",
+        "톤 감지",
+        "표절 검사",
+        "GrammarlyGo AI"
+      ],
+      "pricing": "무료 / 유료 ($12/월 Pro 연간, $15/월 Business)",
+      "monthly_price": 12,
+      "url": "https://grammarly.com",
+      "tags": ["writing", "grammar", "style", "plagiarism", "AI assistant"],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Todoist",
+      "category": "task-management",
+      "description": "AI 어시스턴트가 통합된 태스크 관리 앱",
+      "features": [
+        "AI 어시스턴트",
+        "자연어 입력",
+        "프로젝트 관리",
+        "협업",
+        "연동"
+      ],
+      "pricing": "무료 / 유료 ($5/월 Pro, $8/월 Business) - 2025년 12월부터 인상",
+      "monthly_price": 5,
+      "url": "https://todoist.com",
+      "tags": [
+        "task management",
+        "productivity",
+        "AI assistant",
+        "collaboration"
+      ],
+      "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Asana",
+      "category": "task-management",
+      "description": "AI 기능이 강화된 프로젝트 관리 플랫폼",
+      "features": [
+        "Asana Intelligence",
+        "워크플로우 자동화",
+        "포트폴리오 관리",
+        "목표 추적"
+      ],
+      "pricing": "무료 / 유료 ($10.99/월 Starter, $24.99/월 Advanced)",
+      "monthly_price": 10.99,
+      "url": "https://asana.com",
+      "tags": [
+        "project management",
+        "workflow",
+        "AI automation",
+        "collaboration"
+      ],
+      "updated_at": "2025-11-27"
+    }
+  ]
+}

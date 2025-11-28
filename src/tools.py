@@ -258,10 +258,11 @@ def hybrid_search(
     k: int = 5,
     threshold: float = 0.7,
     category: Optional[str] = None,
-    use_web_fallback: bool = True
+    use_web_fallback: bool = True,
+    include_pdf: bool = True
 ) -> tuple[List[Dict], bool]:
     """
-    하이브리드 검색: RAG + Web Search
+    하이브리드 검색: RAG (JSON + PDF) + Web Search
 
     Args:
         memory_manager: MemoryManager 인스턴스
@@ -270,11 +271,14 @@ def hybrid_search(
         threshold: 유사도 임계값
         category: 카테고리 필터
         use_web_fallback: 웹 검색 폴백 사용 여부
+        include_pdf: PDF 지식베이스 검색 포함 여부
 
     Returns:
         (검색 결과 리스트, fallback 발동 여부)
     """
-    # 1. RAG 검색 (ChromaDB)
+    all_results = []
+
+    # 1. JSON 도구 검색 (ChromaDB - ai_tools 컬렉션)
     rag_results, should_fallback = memory_manager.search_tools(
         query=query,
         k=k,
@@ -282,21 +286,39 @@ def hybrid_search(
         category=category
     )
 
-    # 2. Fallback 조건 확인 및 웹 검색
+    # source 표시 추가
+    for r in rag_results:
+        r["source"] = "json"
+    all_results.extend(rag_results)
+
+    # 2. PDF 지식베이스 검색 (ChromaDB - pdf_knowledge 컬렉션)
+    if include_pdf:
+        pdf_results = memory_manager.search_pdf_knowledge(
+            query=query,
+            k=3,
+            threshold=0.03
+        )
+        all_results.extend(pdf_results)
+
+    # 3. Fallback 조건 확인 및 웹 검색
     if should_fallback and use_web_fallback and google_search.is_available:
         print(f"RAG 결과 부족 (threshold: {threshold}), 웹 검색 실행...")
         web_results = google_search.search(query, num_results=3, category=category)
 
-        # 결과 병합 (중복 제거)
-        existing_names = {r['name'].lower() for r in rag_results}
+        # source 표시 추가
         for wr in web_results:
-            if wr['name'].lower() not in existing_names:
-                rag_results.append(wr)
+            wr["source"] = "web"
+
+        # 결과 병합 (중복 제거)
+        existing_names = {r.get('name', '').lower() for r in all_results if r.get('name')}
+        for wr in web_results:
+            if wr.get('name', '').lower() not in existing_names:
+                all_results.append(wr)
 
     # 점수순 정렬
-    rag_results.sort(key=lambda x: x.get('score', 0), reverse=True)
+    all_results.sort(key=lambda x: x.get('score', 0), reverse=True)
 
-    return rag_results[:k], should_fallback
+    return all_results[:k], should_fallback
 
 
 # ==================== 도구 리스트 ====================

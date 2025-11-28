@@ -180,14 +180,32 @@ HUMAN_REVIEW_MESSAGE = """## 📋 작업 계획 검토
 # ==================== 유틸리티 함수 ====================
 
 def format_search_results(results: list) -> str:
-    """검색 결과를 프롬프트용 문자열로 포맷팅"""
+    """검색 결과를 프롬프트용 문자열로 포맷팅 (출처 표시 포함)"""
     if not results:
         return "검색 결과 없음"
 
     formatted = []
     for idx, r in enumerate(results, 1):
-        formatted.append(f"""
-### {idx}. {r.get('name', 'Unknown')}
+        source = r.get('source', 'json')
+
+        if source == 'pdf':
+            # PDF 결과 포맷
+            content = r.get('content', 'N/A')
+            # 내용이 길면 500자로 제한
+            if len(content) > 500:
+                content = content[:500] + "..."
+
+            formatted.append(f"""
+### {idx}. [PDF 참고자료] {r.get('filename', 'Unknown')}
+- **출처**: PDF 문서 (페이지 {r.get('page', 'N/A')})
+- **내용**: {content}
+- **유사도 점수**: {r.get('score', 0):.2f}
+""".strip())
+        else:
+            # JSON 도구 또는 웹 검색 결과
+            source_label = "[AI 도구]" if source == 'json' else "[웹 검색]"
+            formatted.append(f"""
+### {idx}. {source_label} {r.get('name', 'Unknown')}
 - **카테고리**: {r.get('category', 'N/A')}
 - **설명**: {r.get('description', 'N/A')}
 - **가격**: {r.get('pricing', 'N/A')}

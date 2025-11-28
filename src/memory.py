@@ -3,8 +3,12 @@ Memory Manager - ChromaDB 기반 벡터 저장소 및 사용자 프로필 관리
 """
 import json
 import os
+import glob
 from typing import List, Dict, Optional, Any
 from datetime import datetime
+
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import chromadb
 from chromadb.config import Settings
@@ -40,6 +44,12 @@ class MemoryManager:
         self.profile_collection = self.client.get_or_create_collection(
             name="user_profile",
             metadata={"description": "User preferences and history"}
+        )
+
+        # PDF 지식베이스 컬렉션
+        self.pdf_collection = self.client.get_or_create_collection(
+            name="pdf_knowledge",
+            metadata={"description": "PDF documents knowledge base"}
         )
 
     def _embed_text(self, text: str) -> List[float]:
@@ -164,8 +174,8 @@ class MemoryManager:
             for idx, doc in enumerate(results['documents'][0]):
                 # 거리 → 유사도 변환 (ChromaDB는 L2 거리 사용)
                 distance = results['distances'][0][idx] if results['distances'] else 1.0
-                # L2 거리를 유사도로 변환 (0~1 범위로 정규화)
-                similarity = max(0, 1 - (distance / 2))
+                # L2 거리를 유사도로 변환: 1 / (1 + distance)
+                similarity = 1 / (1 + distance)
 
                 metadata = results['metadatas'][0][idx] if results['metadatas'] else {}
 
@@ -356,6 +366,135 @@ class MemoryManager:
     def get_profiles_count(self) -> int:
         """저장된 사용자 프로필 수 반환"""
         return self.profile_collection.count()
+
+    # ==================== PDF 지식베이스 관련 메서드 ====================
+
+    def load_pdfs_from_directory(self, pdf_dir: str) -> int:
+        """
+        디렉토리 내 모든 PDF 파일을 로드하여 ChromaDB에 저장
+
+        Args:
+            pdf_dir: PDF 파일이 있는 디렉토리 경로
+
+        Returns:
+            저장된 청크 수
+        """
+        # 중복 방지 체크
+        existing_count = self.pdf_collection.count()
+        if existing_count > 0:
+            print(f"기존 {existing_count}개의 PDF 청크가 있습니다. 스킵합니다.")
+            return existing_count
+
+        # PDF 파일 탐색
+        pdf_files = glob.glob(os.path.join(pdf_dir, "*.pdf"))
+        if not pdf_files:
+            print(f"PDF 파일을 찾을 수 없습니다: {pdf_dir}")
+            return 0
+
+        # 텍스트 스플리터 설정
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            separators=["\n\n", "\n", ".", " ", ""]
+        )
+
+        documents = []
+        metadatas = []
+        ids = []
+
+        for pdf_path in pdf_files:
+            filename = os.path.basename(pdf_path)
+            try:
+                loader = PyPDFLoader(pdf_path)
+                pages = loader.load()
+
+                for page in pages:
+                    page_num = page.metadata.get("page", 0)
+                    chunks = text_splitter.split_text(page.page_content)
+
+                    for chunk_idx, chunk in enumerate(chunks):
+                        if chunk.strip():
+                            documents.append(chunk)
+                            metadatas.append({
+                                "source": "pdf",
+                                "filename": filename,
+                                "page": page_num,
+                                "chunk_idx": chunk_idx
+                            })
+                            ids.append(f"pdf_{filename}_{page_num}_{chunk_idx}")
+
+                print(f"PDF 로드 완료: {filename} ({len(pages)} 페이지)")
+
+            except Exception as e:
+                print(f"PDF 로드 실패 ({filename}): {e}")
+                continue
+
+        if not documents:
+            return 0
+
+        # 임베딩 생성 및 저장
+        embeddings = self._embed_texts(documents)
+
+        self.pdf_collection.add(
+            documents=documents,
+            embeddings=embeddings,
+            metadatas=metadatas,
+            ids=ids
+        )
+
+        print(f"총 {len(documents)}개의 PDF 청크를 로드했습니다.")
+        return len(documents)
+
+    def search_pdf_knowledge(
+        self,
+        query: str,
+        k: int = 3,
+        threshold: float = 0.03
+    ) -> List[Dict]:
+        """
+        PDF 지식베이스 검색
+
+        Args:
+            query: 검색 쿼리
+            k: 반환할 최대 결과 수
+            threshold: 유사도 임계값
+
+        Returns:
+            검색 결과 리스트
+        """
+        # PDF 데이터가 없으면 빈 리스트 반환
+        if self.pdf_collection.count() == 0:
+            return []
+
+        query_embedding = self._embed_text(query)
+
+        results = self.pdf_collection.query(
+            query_embeddings=[query_embedding],
+            n_results=k
+        )
+
+        search_results = []
+        if results['documents'] and results['documents'][0]:
+            for idx, doc in enumerate(results['documents'][0]):
+                distance = results['distances'][0][idx] if results['distances'] else 1.0
+                # L2 거리를 유사도로 변환: 1 / (1 + distance)
+                similarity = 1 / (1 + distance)
+
+                if similarity >= threshold:
+                    metadata = results['metadatas'][0][idx] if results['metadatas'] else {}
+                    search_results.append({
+                        "content": doc,
+                        "source": "pdf",
+                        "filename": metadata.get("filename", "Unknown"),
+                        "page": metadata.get("page", 0),
+                        "score": round(similarity, 3)
+                    })
+
+        return search_results
+
+    def get_pdf_count(self) -> int:
+        """저장된 PDF 청크 수 반환"""
+        return self.pdf_collection.count()
 
 
 # 테스트용 코드

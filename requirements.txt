@@ -18,6 +18,9 @@ python-dotenv
 # Google Search
 google-api-python-client
 
+# PDF Processing
+pypdf
+
 # Utilities
 pydantic
 python-multipart

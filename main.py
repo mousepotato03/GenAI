@@ -35,12 +35,18 @@ async def lifespan(app: FastAPI):
     print("AI 101 에이전트 시작...")
     memory = get_memory_manager()
 
-    json_path = "./data/tools_base.json"
+    # 1. JSON 도구 데이터 로드
+    json_path = "./data/ai_tools_2025.json"
     if os.path.exists(json_path):
         count = memory.load_tools_from_json(json_path)
         print(f"AI 도구 데이터 로드 완료: {count}개")
     else:
         print(f"경고: {json_path} 파일을 찾을 수 없습니다.")
+
+    # 2. PDF 지식베이스 로드
+    pdf_dir = "./data"
+    pdf_count = memory.load_pdfs_from_directory(pdf_dir)
+    print(f"PDF 지식베이스 로드 완료: {pdf_count}개 청크")
 
     yield
 
@@ -204,11 +210,7 @@ async def approve_plan(request: ApproveRequest):
 
 def create_gradio_ui():
     """Gradio 채팅 인터페이스 생성"""
-
-    # # 상태 변수
-    # current_thread_id = gr.State(None)
-    # current_plan = gr.State(None)
-
+    
     def chat_start(message: str, history: list, user_id: str):
         """채팅 시작 - Plan 생성"""
         if not message.strip():
