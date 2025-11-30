@@ -630,6 +630,210 @@
         "collaboration"
       ],
       "updated_at": "2025-11-27"
+    },
+    {
+      "name": "Reclaim AI",
+      "category": "time-management",
+      "description": "캘린더·할 일·습관을 분석해 자동으로 집중 시간과 회의·휴식 일정을 재배치해주는 스마트 캘린더",
+      "features": [
+        "업무·개인 일정 자동 타임블로킹",
+        "Todoist·Asana 등 작업과 캘린더 연동",
+        "습관(운동·독서 등) 자동 예약",
+        "팀 회의 시간 최적화",
+        "시간 사용 분석·리포트"
+      ],
+      "pricing": "Lite 무료 / Starter $8/사용자/월 / Business $12/월",
+      "monthly_price": 8,
+      "url": "https://reclaim.ai",
+      "tags": ["calendar", "time blocking", "productivity", "teams"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Taskade",
+      "category": "tasks-notes",
+      "description": "할 일·노트·마인드맵·워크플로를 한 곳에서 관리하고, AI로 계획·요약·자동화를 도움받는 올인원 작업 공간",
+      "features": [
+        "프롬프트 기반 프로젝트·체크리스트 생성",
+        "회의 메모·문서 요약",
+        "마인드맵·칸반·캘린더 뷰",
+        "AI 에이전트·워크플로 자동화",
+        "실시간 협업 편집"
+      ],
+      "pricing": "Free / Pro (월 $8~) / Teams",
+      "monthly_price": 8,
+      "url": "https://www.taskade.com",
+      "tags": ["to-do", "notes", "project management", "AI workspace"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Mem AI",
+      "category": "personal-knowledge",
+      "description": "생각·메모·링크를 아무렇게나 던져도 자동으로 연결·태깅·검색 가능하게 만들어주는 AI 개인 지식 관리 도구",
+      "features": [
+        "자동 태그 및 연관 노트 링크",
+        "강력한 의미 기반 검색",
+        "이메일·캘린더 연동",
+        "회의 녹음·요약",
+        "프롬프트 기반 노트 생성·정리"
+      ],
+      "pricing": "Free / Pro 약 $12/월",
+      "monthly_price": 12,
+      "url": "https://get.mem.ai",
+      "tags": ["second brain", "notes", "personal knowledge", "search"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Pictory",
+      "category": "video-from-text",
+      "description": "블로그 글·스크립트·문서를 넣으면 자동으로 짧은 하이라이트 영상·숏폼 콘텐츠를 생성해주는 AI 비디오 툴",
+      "features": [
+        "텍스트 → 영상 자동 생성",
+        "자막·하이라이트 자동 추출",
+        "템플릿 기반 쇼츠·SNS용 비디오",
+        "음성 합성 및 배경 음악",
+        "슬라이드·프레젠테이션 → 영상 변환"
+      ],
+      "pricing": "Starter 약 $19–25/월, Professional $49/월",
+      "monthly_price": 25,
+      "url": "https://pictory.ai",
+      "tags": ["video", "social content", "marketing", "repurposing"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Copy.ai",
+      "category": "marketing-content",
+      "description": "마케팅 팀을 위한 카피·이메일·시퀀스·워크플로 자동화 플랫폼 (GTM AI 플랫폼)",
+      "features": [
+        "블로그·광고·이메일 카피 템플릿",
+        "브랜드 보이스 학습 및 일관성 유지",
+        "리드 nurturing·캠페인 워크플로 자동화",
+        "콘텐츠 에이전트·워크플로 빌더",
+        "다양한 LLM 통합 및 협업 기능"
+      ],
+      "pricing": "Free / Chat 플랜 $29/월 / Pro $49/월",
+      "monthly_price": 49,
+      "url": "https://www.copy.ai",
+      "tags": ["copywriting", "marketing", "automation", "GTM"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Jasper",
+      "category": "marketing-content",
+      "description": "브랜드 보이스·스타일 가이드를 학습해 대규모 마케팅 콘텐츠를 일관된 톤으로 생성하는 AI 플랫폼",
+      "features": [
+        "브랜드 보이스·스타일 가이드 관리",
+        "블로그·랜딩·광고·이메일 템플릿",
+        "팀 협업·승인 워크플로",
+        "SEO 도구·Zapier 등과 연동",
+        "캠페인별 에셋 자동 생성"
+      ],
+      "pricing": "무료 체험 / Creator $39/월~",
+      "monthly_price": 39,
+      "url": "https://www.jasper.ai",
+      "tags": ["brand voice", "content at scale", "marketing", "teams"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Surfer SEO",
+      "category": "seo-optimization",
+      "description": "콘텐츠를 입력하면 상위 경쟁 페이지·키워드를 분석해, 검색 최적화 점수와 개선 가이드를 제공하는 SEO 도구",
+      "features": [
+        "콘텐츠 에디터(SEO 점수·키워드 제안)",
+        "콘텐츠 감사·SERP 분석",
+        "AI 글 생성·내부 링크 추천",
+        "키워드 리서치",
+        "랭크·토픽 맵 기능"
+      ],
+      "pricing": "Essential 약 $59–99/월",
+      "monthly_price": 79,
+      "url": "https://surferseo.com",
+      "tags": ["SEO", "content optimization", "marketing"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Clockwise",
+      "category": "team-calendar",
+      "description": "팀 전체 캘린더를 분석해서 회의 시간을 재배치하고, 각자에게 집중 시간을 확보해주는 일정 최적화 도구",
+      "features": [
+        "팀 회의 자동 재배치",
+        "개인별 집중 시간 블록 확보",
+        "Google Calendar·Slack 연동",
+        "업무·개인 일정 균형 추천",
+        "팀 생산성 리포트"
+      ],
+      "pricing": "Free / Teams ($6.75/월~)",
+      "monthly_price": 7,
+      "url": "https://www.getclockwise.com",
+      "tags": ["calendar", "focus time", "teams", "productivity"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Any.do",
+      "category": "task-management",
+      "description": "개인·업무 할 일을 관리하면서, AI가 할 일 목록을 자동 생성·보완해 주는 투두 리스트 앱",
+      "features": [
+        "할 일·리마인더·캘린더 통합",
+        "AI가 다음 단계·작업 목록 제안",
+        "모바일·데스크톱·웹 동기화",
+        "음성 입력·위치 기반 리마인더",
+        "다른 앱과의 간단한 연동"
+      ],
+      "pricing": "Free / Premium ($5/월)",
+      "monthly_price": 5,
+      "url": "https://www.any.do",
+      "tags": ["to-do", "personal productivity", "planning"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Loom",
+      "category": "async-communication",
+      "description": "화면·웹캠을 녹화해 짧은 설명 영상을 만든 뒤, AI가 요약·하이라이트로 정리해주는 비동기 커뮤니케이션 도구",
+      "features": [
+        "화면·웹캠·음성 동시 녹화",
+        "자동 자막·요약·액션 아이템 생성",
+        "주요 구간 하이라이트 추출",
+        "코멘트·타임스탬프 피드백",
+        "링크 공유 기반 배포"
+      ],
+      "pricing": "Free / Business ($12.50/월)",
+      "monthly_price": 12.5,
+      "url": "https://www.loom.com",
+      "tags": ["async video", "team communication", "explanations"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Scribe",
+      "category": "process-documentation",
+      "description": "소프트웨어에서 실제로 작업하는 과정을 기록해, 자동으로 클릭별 스텝 가이드·스크린샷 문서를 생성하는 도구",
+      "features": [
+        "화면 상의 클릭·입력 단계 자동 캡처",
+        "단계별 스크린샷·텍스트 설명 자동 생성",
+        "가이드 공유·임베드",
+        "민감 정보 자동 마스킹 옵션",
+        "AI 기반 설명 개선·요약"
+      ],
+      "pricing": "Free / Pro ($23/월)",
+      "monthly_price": 23,
+      "url": "https://scribehow.com",
+      "tags": ["SOP", "how-to guide", "onboarding", "operations"],
+      "updated_at": "2025-12-01"
+    },
+    {
+      "name": "Lindy AI",
+      "category": "no-code-automation",
+      "description": "비개발자도 노코드로 업무용 AI 에이전트·자동화를 구성할 수 있게 해주는 에이전트 빌더 플랫폼",
+      "features": [
+        "시각적 플로우 빌더",
+        "CRM·헬프데스크·이메일·캘린더 등과 연동",
+        "반복적인 백오피스 작업 에이전트화",
+        "여러 에이전트 협업(워크포스) 지원",
+        "보안·권한 관리·로그"
+      ],
+      "pricing": "무료 체험 / Starter ($49/월~)",
+      "monthly_price": 49,
+      "url": "https://www.lindy.ai",
+      "tags": ["AI agents", "no-code", "business automation"],
+      "updated_at": "2025-12-01"
     }
   ]
 }

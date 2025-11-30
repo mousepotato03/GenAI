@@ -22,6 +22,8 @@ from src.prompts import (
     GUIDE_FALLBACK_SYSTEM_PROMPT, GUIDE_FALLBACK_USER_TEMPLATE,
     SYNTHESIZE_SYSTEM_PROMPT, SYNTHESIZE_USER_TEMPLATE,
     HUMAN_REVIEW_MESSAGE,
+    INTENT_ANALYSIS_SYSTEM_PROMPT, INTENT_ANALYSIS_USER_TEMPLATE,
+    MODIFY_PLAN_SYSTEM_PROMPT, MODIFY_PLAN_USER_TEMPLATE,
     format_search_results, format_plan_summary, format_user_profile, format_guides
 )
 
@@ -104,6 +106,86 @@ def get_memory_manager() -> MemoryManager:
 def get_llm(temperature: float = 0.7) -> ChatOpenAI:
     """LLM 인스턴스 반환"""
     return ChatOpenAI(model=LLM_MODEL, temperature=temperature)
+
+
+def analyze_user_intent(user_text: str, plan_summary: str) -> dict:
+    """
+    사용자의 자연어 응답에서 의도를 분석
+
+    Args:
+        user_text: 사용자가 입력한 자연어 텍스트
+        plan_summary: 현재 제시된 계획 요약
+
+    Returns:
+        {"action": "approve"/"modify"/"cancel", "feedback": str}
+    """
+    llm = get_llm(temperature=0.1)  # 낮은 temperature로 일관성 확보
+
+    user_prompt = INTENT_ANALYSIS_USER_TEMPLATE.format(
+        plan_summary=plan_summary,
+        user_response=user_text
+    )
+
+    response = llm.invoke([
+        SystemMessage(content=INTENT_ANALYSIS_SYSTEM_PROMPT),
+        HumanMessage(content=user_prompt)
+    ])
+
+    try:
+        response_text = response.content.strip()
+        # JSON 블록 추출
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0]
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0]
+
+        result = json.loads(response_text)
+        return {
+            "action": result.get("intent", "approve"),
+            "feedback": result.get("feedback", "")
+        }
+    except Exception as e:
+        print(f"의도 분석 파싱 오류: {e}")
+        # 파싱 실패 시 기본값으로 승인 처리
+        return {"action": "approve", "feedback": ""}
+
+
+def modify_subtasks(subtasks: list, feedback: str) -> list:
+    """
+    사용자 피드백에 따라 subtasks 수정
+
+    Args:
+        subtasks: 현재 계획의 subtasks 리스트
+        feedback: 사용자의 수정 요청
+
+    Returns:
+        수정된 subtasks 리스트
+    """
+    llm = get_llm(temperature=0.1)
+
+    current_plan = json.dumps(subtasks, ensure_ascii=False, indent=2)
+
+    response = llm.invoke([
+        SystemMessage(content=MODIFY_PLAN_SYSTEM_PROMPT),
+        HumanMessage(content=MODIFY_PLAN_USER_TEMPLATE.format(
+            current_plan=current_plan,
+            feedback=feedback
+        ))
+    ])
+
+    try:
+        response_text = response.content.strip()
+        # JSON 블록 추출
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0]
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0]
+
+        modified = json.loads(response_text)
+        return modified
+    except Exception as e:
+        print(f"계획 수정 파싱 오류: {e}")
+        return subtasks  # 실패 시 원본 반환
 
 
 # ==================== 노드 함수들 ====================
@@ -199,6 +281,7 @@ def human_review_node(state: AgentState) -> Dict:
     """
     [Node 3] Human-in-the-loop: 사용자 승인 대기
     interrupt()를 사용하여 실행 중단
+    자연어 입력을 LLM으로 분석하여 의도 파악
     """
     print("[Node] human_review 실행")
 
@@ -211,14 +294,26 @@ def human_review_node(state: AgentState) -> Dict:
     # interrupt로 실행 중단 - 사용자 입력 대기
     user_response = interrupt({
         "message": review_message,
-        "plan": subtasks,
-        "options": ["approve", "modify", "cancel"]
+        "plan": subtasks
     })
 
-    # 사용자 응답 처리
-    action = user_response.get("action", "approve")
-    feedback = user_response.get("feedback", "")
+    # === 자연어 의도 분석 ===
+    if isinstance(user_response, str):
+        # 자연어 텍스트 → LLM으로 의도 분석
+        print(f"  - 자연어 입력 분석: {user_response}")
+        analyzed = analyze_user_intent(user_response, plan_summary)
+        action = analyzed["action"]
+        feedback = analyzed["feedback"]
+        print(f"  - 분석 결과: action={action}, feedback={feedback}")
+    elif isinstance(user_response, dict):
+        # 기존 방식 (하위 호환성)
+        action = user_response.get("action", "approve")
+        feedback = user_response.get("feedback", "")
+    else:
+        action = "approve"
+        feedback = ""
 
+    # 사용자 응답 처리
     if action == "cancel":
         return {
             "plan_approved": False,
@@ -228,10 +323,14 @@ def human_review_node(state: AgentState) -> Dict:
         }
 
     if action == "modify" and feedback:
-        # 수정된 계획 반영 (간단한 처리)
+        # 수정된 계획 반영 - LLM으로 subtasks 실제 수정
+        modified_subtasks = modify_subtasks(subtasks, feedback)
+        print(f"  - 수정된 계획: {len(subtasks)} → {len(modified_subtasks)}개 작업")
+
         return {
             "plan_approved": True,
             "user_feedback": feedback,
+            "subtasks": modified_subtasks,  # 수정된 subtasks 반환
             "messages": [AIMessage(content=f"수정 사항을 반영하여 진행합니다: {feedback}")]
         }
 
