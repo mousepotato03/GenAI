@@ -1,139 +1,90 @@
-## 1. 프로젝트를 위한 전체적인 흐름 (LangGraph/ReAct 순환 구조)
+## 1. LangGraph 상태 모델 (State Definition)
 
-사용자의 질문이 들어왔을 때부터 최종 답변을 반환하기까지의 과정은 **ReAct 루프**를 따르며, 이는 LangGraph의 **노드(Node)**와 **조건부 에지(Conditional Edge)**를 통해 구현됩니다.
+LangGraph의 **State(상태)**는 에이전트의 단기 메모리이자 모든 노드 간의 데이터 흐름을 정의하는 핵심 구조입니다. 프로젝트 요구사항에 맞춰 LangGraph `TypedDict`와 `Annotated list`를 사용하여 정의해야 합니다.
 
-### A. 핵심 LangGraph 구성 요소 정의
+| 필드 이름                  | 타입                                  | 역할                                                                                                                                                                            | 소스                                                                                                                                                      |
+| :------------------------- | :------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **`messages`**             | `Annotated[List[dict], add_messages]` | **단기 메모리(Short Term Memory)**: 사용자 질문, LLM 응답, 그리고 **도구 실행 결과(Observation)**가 순서대로 누적됩니다. `add_messages` 리듀서 사용으로 자동 누적을 보장합니다. |                                                                                                                                                           |
+| **`tool_result`**          | `str                                  | None`                                                                                                                                                                           | LLM이 요청한 도구 호출(Function Call) 정보(JSON 직렬화)가 저장됩니다. LLM 노드와 툴 노드 간의 ReAct 루프 분기(Conditional Edge)를 결정하는 데 사용됩니다. |     |
+| **`is_complex_task`**      | `bool`                                | 사용자의 질문이 단순 Q&A인지, 서브태스크 분할이 필요한 복잡한 **작업 처리** 수준인지 판단한 결과입니다 (작업 1).                                                                |                                                                                                                                                           |
+| **`sub_tasks`**            | `List[str]`                           | LLM이 분할한 실행 계획 목록입니다 (작업 2). (예: `["대본 작성", "영상 생성"]`)                                                                                                  |                                                                                                                                                           |
+| **`tool_recommendations`** | `Dict[str, str]`                      | 각 `sub_task`에 대해 추천된 **최종 서비스/도구 정보**를 저장합니다 (작업 3).                                                                                                    | (프로젝트 정의)                                                                                                                                           |
+| **`user_feedback`**        | `str                                  | None`                                                                                                                                                                           | Human Review 단계에서 사용자가 제공한 **수정/피드백 내용**을 임시로 저장하여 Re-planning에 활용합니다.                                                    |     |
+| **`retrieved_docs`**       | `List[dict]`                          | RAG Tool (retrieve_docs) 또는 Google Search Tool의 검색 결과를 저장하여 LLM의 답변 생성 컨텍스트로 사용합니다.                                                                  |                                                                                                                                                           |
+| **`final_guide`**          | `str                                  | None`                                                                                                                                                                           | 작업 5의 최종 작업 워크플로우 가이드 결과물입니다.                                                                                                        |     |
 
-에이전트의 상태(State)와 논리적인 흐름을 정의하는 것이 가장 먼저 수행되어야 합니다.
+## 2. LangGraph 노드 구성 및 역할 (Node Configuration)
 
-| 구성 요소                  | 역할 및 설명                                                                                                                                                                                            | 소스 인용 |
-| :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------- |
-| **State (상태 모델)**      | 그래프 전체가 공유하는 데이터 저장소입니다. `messages`와 `tool_result`가 핵심이며, `TypedDict`와 `Annotated list`를 사용하여 정의해야 합니다.                                                           |           |
-| **Messages (단기 메모리)** | 지금까지의 대화 히스토리와 툴 호출 기록(Function Call history, Observation)을 저장하며, **단기 메모리** 역할을 합니다. `Annotated[List[dict], add_messages]`를 사용하여 자동으로 누적되도록 관리합니다. |           |
-| **Tool Result**            | LLM이 도구 호출(Tool Call)을 결정했을 경우, 해당 호출 정보(함수 이름, 인수)가 저장되는 필드입니다. 이 값이 `None`인지 아닌지에 따라 다음 단계(도구 실행 또는 종료)가 결정됩니다.                        |           |
-| **Nodes**                  | `State`를 입력받아 새로운 `State`를 반환하는 함수입니다. 최소한 **LLM 노드**와 **Tool 노드**가 필요합니다.                                                                                              |           |
-| **Conditional Edge**       | LLM 노드의 출력(tool_result)을 기반으로 그래프의 흐름을 **분기**시키는 지능적인 기능입니다. ReAct 루프를 구현하는 핵심입니다.                                                                           |           |
+LangGraph는 ReAct 패턴을 구현하기 위해 최소한 `llm_agent`와 `tool_executor` 노드가 필요하며, 프로젝트의 복잡한 5단계 워크플로우를 처리하기 위해 추가적인 전용 노드들이 필요합니다.
 
-### B. 사용자 질문 처리 흐름 (ReAct Loop in LangGraph)
+| 노드 이름                      | 타입                  | 역할 (담당 작업)                                                                                                                                                             | 핵심 기능                       |
+| :----------------------------- | :-------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------ |
+| **`llm_router`** (Entry Point) | LLM Node              | **[작업 1]** 사용자 질문을 받아 단순 Q&A인지 복잡한 작업인지 판단하고 `is_complex_task` 플래그 설정.                                                                         | LLM 추론, State 업데이트.       |
+| **`planning_node`**            | LLM Node              | **[작업 2]** 질문을 받아 최적의 서브태스크(`sub_tasks`) 목록으로 분리합니다. `user_feedback`이 있으면 Re-planning을 수행합니다.                                              | LLM 추론, State 업데이트.       |
+| **`recommend_tool_node`**      | LLM Node (Tool Agent) | **[작업 3, 4]** 각 `sub_task`에 대해 RAG Tool (retrieve_docs)나 Search Tool, Calc/Time Tool을 호출하여 최적의 서비스 1개를 추천합니다. 이 노드는 ReAct 루프의 중심이 됩니다. | ReAct 루프, Tool Calling.       |
+| **`tool_executor`**            | Tool Node             | LLM이 요청한 모든 도구 호출(`tool_result`)을 받아 실제 함수(RAG, Search, Calc, Time, Memory)를 실행하고 **Observation** 메시지를 반환합니다.                                 | 도구 실행 (Observation).        |
+| **`guide_generation_node`**    | LLM Node              | **[작업 5]** 승인된 계획, 추천된 도구, 검색된 정보를 종합하여 **최종 워크플로우 가이드**를 생성합니다.                                                                       | 최종 답변 생성, State 업데이트. |
+| **`reflection_node`**          | LLM/Tool Node         | **[작업 6]** 대화 완료 후, Memory Extractor Prompt를 사용하여 사용자 피드백/선호도를 추출하고 `write_memory` Tool을 호출하여 장기 메모리(Chroma DB)에 저장합니다.            | Memory Write, Reflection.       |
 
-1.  **시작 및 입력:**
+### 2.1 통합된 도구 (Tools)
 
-    - 사용자가 Gradio UI를 통해 질문을 입력합니다.
-    - LangGraph는 초기 `State` (메시지: 사용자 질문, `tool_result`: `None`)를 가지고 시작합니다.
-    - **시작 지점 (Entry Point):** `llm` 노드로 설정됩니다.
+프로젝트에 필요한 모든 도구는 `tool_executor` 노드에 등록되며, LLM에게는 **JSON 스키마** 형태로 전달됩니다.
 
-2.  **LLM 1차 호출 (Thought / Action 추론) - `llm_node` 실행:**
+1.  **RAG Tool (`retrieve_docs`):** JSON (기본 지식)과 PDF (최신 트렌드)를 **하이브리드**로 검색하는 핵심 도구입니다. Chroma DB와 다국어 임베더(`paraphrase-multilingual-MiniLM-L12-v2`)를 사용합니다.
+2.  **Long Term Memory Tool (`read_memory`, `write_memory`):** Chroma DB Persistent를 활용하여 사용자의 선호도, 과거 피드백, 장기 목표 등을 벡터화하여 저장하고 검색합니다.
+3.  **Utility Tools (`calculator`, `get_time`, `google_search`):** 가격 계산, 최신 정보 판단, 웹 검색 등 보조적인 역할에 사용됩니다.
 
-    - `llm_node`는 현재 `messages` (대화 기록)와 정의된 모든 `tools` (구글 검색, 계산기, RAG, 메모리 등)를 포함하여 **`gpt-4o-mini`**를 호출합니다.
-    - LLM은 질문을 분석하여 **'생각(Thought)'**을 하고, 다음 **'행동(Action)'**을 결정합니다.
-      - **경우 1: 도구 호출이 필요한 경우 (Action):** LLM은 도구 호출 객체(`tool_calls`)를 반환합니다. `llm_node`는 이 호출 정보를 `tool_result`에 JSON 형태로 저장하고, LLM의 응답(tool_calls)을 `messages`에 추가한 새로운 `State`를 반환합니다.
-      - **경우 2: 최종 답변이 가능한 경우 (Final):** LLM은 최종 답변 텍스트를 반환하고, `tool_calls`는 `None`입니다. `llm_node`는 LLM의 답변을 `messages`에 추가하고 `tool_result`를 `None`으로 설정한 `State`를 반환합니다.
+## 3. 사용자 질문 처리 흐름 (LangGraph Workflow)
 
-3.  **흐름 분기 (Conditional Edge) - `route` 함수 실행:**
+프로젝트의 다단계 작업은 **세 가지 주요 그래프 흐름**으로 구성되며, **Human-in-the-Loop**를 위해 LangGraph의 **Interrupt** 기능이 핵심적으로 사용됩니다.
 
-    - LangGraph는 `llm_node`가 반환한 `State`를 검사합니다.
-    - **`tool_result`가 `None`이 아니면** (`tool` 노드로 이동).
-    - **`tool_result`가 `None`이면** (`END`로 이동, 최종 답변 반환).
+### 단계 1: 작업 유형 분류 및 계획 수립
 
-4.  **도구 실행 (Action → Observation) - `tool_node` 실행:**
+1.  **시작 (`START` → `llm_router`):** 사용자 질문이 그래프에 진입합니다. `llm_router`가 질문을 분석하여 **`is_complex_task`** 플래그를 결정합니다 (작업 1).
+2.  **조건부 분기:**
+    - **IF** `is_complex_task == False` (단순 Q&A): `guide_generation_node`로 바로 이동하여 답변을 생성하고 `END`로 종료합니다.
+    - **IF** `is_complex_task == True` (복잡한 작업): `planning_node`로 이동합니다.
+3.  **계획 수립 (`planning_node`):** LLM은 질문을 최적의 `sub_tasks` (계획) 목록으로 분할하여 State에 저장합니다.
 
-    - `tool_node`는 `State`에서 `tool_result`를 읽어들여 실제 Python 함수/클래스를 호출합니다.
-      - 예: `tool_result`가 `calculator` 호출을 지시하면, `tool_node`는 `calculator()` 함수를 실행합니다.
-    - 도구 실행 결과는 **'관찰(Observation)'**이 됩니다.
-    - `tool_node`는 이 Observation을 `role: "tool"` 메시지 형식으로 변환하고, 이를 기존 `messages`에 추가합니다.
-    - `tool_node`는 `tool_result`를 다시 `None`으로 설정한 `State`를 반환하며, **다시 `llm_node`로 돌아가는 에지**를 따라 루프를 반복합니다.
+### 단계 2: Human-in-the-Loop 검토 및 수정 (Interrupt)
 
-5.  **LLM 2차 호출 (최종 답변 생성):**
+이 단계는 **LangGraph의 `interrupt_before`** 기능을 사용하여 사용자의 승인/수정 피드백을 반영합니다.
 
-    - `llm_node`가 관찰 결과(`role: "tool"` 메시지)를 포함한 새로운 `messages` 리스트를 가지고 다시 호출됩니다.
-    - LLM은 이 관찰 결과(RAG 문서, 계산 값, 메모리 내용 등)를 활용하여 최종 사용자 친화적인 답변을 생성합니다.
-    - `tool_calls`가 `None`인 응답을 반환하고, 그래프는 `END`로 종료됩니다.
+1.  **중단 지점 설정:** LangGraph를 컴파일할 때, `planning_node` 다음에 실행될 `recommend_tool_node` 직전에 **Interrupt**를 설정합니다 (`interrupt_before=["recommend_tool_node"]`).
+2.  **사용자 검토:** `planning_node` 실행 후 그래프가 멈춥니다.
+    - Gradio UI는 State에서 `sub_tasks` 목록을 읽어 사용자에게 제시하고 승인을 요청합니다.
+3.  **피드백 및 재개:**
+    - **승인 시:** 클라이언트 코드는 `graph.invoke(None, config)`를 호출하여 **`recommend_tool_node`**로 실행을 재개합니다.
+    - **수정 요청 시:** 사용자의 수정 내용은 `updated_msg` 형태로 변환됩니다. 클라이언트 코드는 `graph.update_state()` 함수를 사용하여 `sub_tasks` 또는 `user_feedback` 필드를 업데이트하고 (`as_node="planning_node"`), `planning_node`로 돌아가 Re-planning 루프를 수행하도록 설정하거나, `recommend_tool_node`로 넘어가기 전에 `planning_node`가 수정된 계획을 반영하도록 합니다.
 
-6.  **(선택) Reflection/자동 메모리 저장:**
-    - 최종 답변이 생성된 후, **Reflection** 기능을 구현하기 위해 별도의 노드 또는 최종 처리 단계에서 **자동 메모리 저장** 로직을 실행할 수 있습니다.
-    - 이 단계에서는 LLM(Memory Extractor Prompt 사용)을 호출하여 이번 턴의 대화 내용 중 장기 메모리(Chroma DB)에 저장할 가치가 있는 내용(`profile`, `episodic`, `knowledge`)이 있는지 판단하고 `write_memory` 도구를 호출하거나 직접 저장합니다.
+### 단계 3: 도구 추천 및 ReAct 루프 (RAG/Tool Execution)
 
----
+승인된 `sub_tasks`를 바탕으로 각 태스크에 맞는 서비스 추천을 수행합니다 (작업 3, 4). 이 과정은 **LLM 노드와 Tool 노드가 순환하는 ReAct 루프**를 따릅니다.
 
-## 2. LLM, 툴, RAG, 메모리 구현 상세
+1.  **LLM 추론 (`recommend_tool_node`):** LLM은 현재 남은 `sub_task`를 확인하고, 이를 해결하기 위해 필요한 정보(기본 지식, 최신 정보, 가격 등)를 파악합니다.
+2.  **Action (Tool Call):** LLM은 **RAG Tool** (`retrieve_docs`) 또는 **Search Tool**을 호출합니다. 이 호출 정보는 `tool_result`에 저장됩니다.
+    - (예: `tool_calls: [{"name": "retrieve_docs", "arguments": {"query": "유튜브 쇼츠 제작 AI 도구 최신"}}]`)
+3.  **분기 (`Conditional Edge`):**
+    - **IF** `tool_result != None`: `tool_executor` 노드로 이동합니다.
+4.  **Observation (`tool_executor`):** `tool_executor`는 `retrieve_docs` Tool을 실행하여 JSON 및 PDF 지식베이스에서 하이브리드 검색을 수행하고 **검색 결과**(`retrieved_docs`)를 얻습니다. 이 결과는 `role: "tool"` 메시지 형태로 `messages`에 추가됩니다.
+5.  **LLM 재추론 (Loop Back):** `tool_executor`는 다시 **`recommend_tool_node`**로 연결됩니다. LLM은 검색 결과(Observation)를 보고 해당 도구의 적합성을 판단합니다 (유사도 임계값 체크 포함).
+6.  **Tool Recommendation 저장:** LLM은 가장 적합한 서비스를 `tool_recommendations` 필드에 저장하고 다음 `sub_task`로 넘어갈지, 아니면 추가적인 정보(예: 계산기나 시간)가 필요한지 판단합니다 (작업 4).
+7.  **Finalize Action:** 모든 `sub_task`에 대한 추천이 완료되면, LLM은 `tool_result`를 `None`으로 반환하여 Conditional Edge가 다음 단계로 이동하도록 합니다.
 
-프로젝트 요구사항에 따라 구현해야 할 구체적인 요소들은 다음과 같습니다.
+### 단계 4: 최종 가이드 생성 및 메모리 저장
 
-### ① LLM 활용
-
-- **모델:** `gpt-4o-mini`를 기본 LLM으로 사용합니다.
-- **API:** OpenAI 기본 API를 사용하여 `client.chat.completions.create` 함수를 호출하며, 이때 `tools` 파라미터에 사용할 도구들의 JSON 스키마를 전달해야 합니다.
-
-### ② Tool – Tool Calling 구현
-
-모든 도구는 LLM에게 JSON 스키마 형태로 정의되어야 하며, LLM이 이를 보고 호출을 결정합니다.
-
-| 도구 이름                           | 역할 및 구현 내용                                                                                                       | 소스 인용 |
-| :---------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :-------- |
-| **계산기 (Calculator)**             | 수학적 표현식(`expr`)을 입력받아 결과를 반환합니다. `eval()` 함수를 이용한 간단한 구현 예시가 소스에 제시되어 있습니다. |           |
-| **구글 검색 API**                   | 웹 검색이 필요한 질의에 대해 외부 정보를 검색하여 결과를 반환합니다.                                                    |           |
-| **시간**                            | 현재 시간을 문자열로 반환합니다. `get_time` 함수 예시가 소스에 제시되어 있으며, 타임존 인수를 가질 수 있습니다.         |           |
-| **RAG Tool (retrieve_docs)**        | PDF 문서 검색을 담당하는 핵심 도구입니다.                                                                               |           |
-| **Memory Tool (read/write_memory)** | 장기 메모리 접근을 위한 도구입니다.                                                                                     |           |
-
-### ③ RAG – Tool Calling 구현 (지식/문서 메모리)
-
-RAG(검색 증강 생성)는 에이전트가 외부 문서를 검색하여 정보를 프롬프트에 주입하는 구조입니다. 프로젝트에서는 디렉토리의 PDF 파일을 색인하고 검색하는 도구를 구현해야 합니다.
-
-1.  **전처리 (색인 구축):**
-
-    - PDF Reader를 사용하여 문서를 읽어옵니다.
-    - 텍스트 분리기(Sentence Splitter)를 사용하여 문서를 검색하기 쉬운 작은 청크로 분할합니다.
-    - **한영 multi-ligual embedder** (예: `"paraphrase-multilingual-MiniLM-L12-v2"`)를 사용하여 각 청크를 고차원 벡터로 변환합니다.
-    - 이 벡터와 원본 텍스트를 **Chroma DB** (Persistent DB)에 저장하고 HNSW 색인 기법을 사용하여 검색 효율성을 높입니다.
-
-2.  **RAG 실행 (Tool 호출):**
-    - LLM이 사용자 질문을 보고 RAG가 필요하다고 판단하면, `retrieve_docs` (RAG Tool)를 호출합니다.
-    - `tool_node`는 쿼리를 임베딩하여 Chroma DB에서 **의미적 유사성**이 높은 문서를 검색합니다.
-    - 검색된 문서(컨텍스트)는 `Observation`으로 LLM에 다시 전달되며, LLM은 이 컨텍스트를 바탕으로 최종 답변을 생성합니다.
-
-### ④ Memory – Tool Calling 구현
-
-프로젝트는 단기 메모리와 장기 메모리를 모두 구현해야 합니다.
-
-1.  **단기 메모리 (Short Term Memory):**
-
-    - **LangGraph State**의 `messages` 필드 자체가 Short Term 메모리 역할을 합니다.
-    - `messages`는 `Annotated list`를 사용하여 이전 대화의 흐름과 툴 호출 결과(Observation)를 자동으로 누적하여 관리합니다.
-
-2.  **장기 메모리 (Long Term Memory):**
-
-    - **Chroma DB Persistent**를 사용하여 과거 대화 기록이나 사용자 프로필 정보를 벡터화하여 저장합니다.
-    - **`read_memory`** Tool을 호출하여 사용자가 과거에 언급한 내용이나 중요한 에피소드(경험) 메모리를 검색합니다. 검색 원리는 RAG와 유사하게 의미적 유사성을 기반으로 합니다.
-    - **`write_memory`** Tool을 사용하여 새로운 정보를 장기적으로 저장합니다.
-
-3.  **Reflection (자동 메모리 저장):**
-    - 자동 메모리 저장을 구현하여 한 턴이 끝난 후, LLM이 대화 내용을 분석하여 저장할 가치가 있는지 판단하고 `write_memory` 도구를 호출하거나 직접 DB에 기록하는 파이프라인이 필요합니다.
-    - 이 과정에서 **Memory Extractor Prompt**를 사용하여 메모리 타입(프로필, 에피소드, 지식)과 중요도를 구조화된 JSON 형태로 추출할 수 있습니다.
-
-### ⑤ Graph 엔진 – LangGraph 고급 기능 활용
-
-LangGraph의 주요 특징은 Agent의 상태를 저장하고 흐름을 제어하는 것입니다.
-
-- **State:** 위에서 설명한 `Annotated list`를 활용하여 `messages` 히스토리 누적을 자동화합니다.
-- **Interrupt 기능:** 특정 노드(예: 최종 답변 직전)에서 실행을 멈추고 사람의 검토나 입력을 받은 뒤, `update_state()` 함수를 사용하여 상태를 업데이트하고 다시 실행을 재개(Resume)하는 **Human-In-The-Loop** 기능을 구현해야 합니다.
-- **Stream 기능:** 그래프 실행 과정을 단계별로 모니터링하여, 각 노드의 완료 시점마다 결과를 실시간으로 사용자에게 보여주는 기능을 구현합니다. `graph.stream(inputs)` 메서드를 사용할 수 있습니다.
+1.  **최종 가이드 생성 (`guide_generation_node`):** 이 노드는 승인된 계획(`sub_tasks`)과 추천된 서비스(`tool_recommendations`)를 바탕으로, 검색 결과(`retrieved_docs`)를 활용하여 사용자가 작업을 실제로 수행할 수 있는 상세한 **워크플로우 가이드**를 작성하고 `final_guide`에 저장합니다 (작업 5).
+2.  **종료 및 Reflection (`reflection_node`):**
+    - **[작업 6]** 에이전트는 최종 답변(가이드)을 사용자에게 반환하기 전에, 이 노드를 실행하여 대화 내용을 분석합니다.
+    - LLM(Memory Extractor Prompt 사용)을 호출하여 사용자 선호도나 피드백(예: "우리 지식 베이스에 없는 도구 요청")을 추출합니다.
+    - 추출된 정보는 `write_memory` Tool을 통해 장기 메모리(Chroma DB Persistent)에 저장됩니다.
+3.  **그래프 종료 (`END`):** 최종 답변을 반환하며 워크플로우를 종료합니다.
 
 ---
 
-## 3. LangGraph 적용을 통한 ReAct 루프 완성
+**비유:** 이 에이전트 시스템은 마치 **복잡한 프로젝트를 처리하는 컨설팅 팀**과 같습니다.
 
-전반적으로, 이 프로젝트는 단일 Python 스크립트 내에서 ReAct 루프를 구현하는 것이 아니라, LangGraph라는 오케스트레이션 프레임워크를 사용하여 LLM 호출, 툴 실행, 분기 로직(ReAct)을 명확하게 **모듈화**하고 **그래프화**하는 데 있습니다.
-
-LangGraph를 사용하면, 기본 Tool Calling 워크플로우를 루프(Loop) 구조로 쉽게 변환할 수 있습니다.
-
-**LangGraph가 ReAct를 구현하는 방식:**
-
-| ReAct 단계             | LangGraph 요소                          | 데이터 흐름 (State 업데이트)                                                                     |
-| :--------------------- | :-------------------------------------- | :----------------------------------------------------------------------------------------------- |
-| **Thought** (추론)     | LLM Node 내부 (LLM의 비노출 영역)       | LLM이 `messages`를 읽고 행동을 결정.                                                             |
-| **Action** (행동)      | LLM Node 출력 (`tool_result` != `None`) | LLM이 `tool_calls`를 반환하고, 이것이 `tool_result`에 저장됨.                                    |
-| **Observation** (관찰) | Tool Node 실행                          | `tool_node`가 `tool_result`의 도구를 실행하고, 결과를 `role: "tool"` 메시지로 `messages`에 추가. |
-| **Repeat / Final**     | Conditional Edge (`route` 함수)         | `tool_result`가 `None`이 아니면 `tool` → `llm` 루프를 반복하고, `None`이면 `END`.                |
-
-LangGraph는 마치 **컨베이어 벨트 위의 공장 관리자**와 같습니다. 사용자 질문이라는 원료가 들어오면, LLM 노드라는 작업자에게 상태(State)를 전달하고, 작업자가 도구 호출이라는 청사진을 내놓으면, LangGraph는 컨베이어 벨트를 Tool 노드로 돌려 실제 작업을 실행(Observation)하게 한 다음, 다시 LLM 작업자에게 결과와 함께 상태를 돌려보내 최종 제품(Final Answer)이 나올 때까지 이 과정을 반복하게 합니다. 이 모든 과정에서 `State`가 변경될 때마다 체크포인트를 저장(persistence)할 수 있어, 에이전트가 이전의 기억을 잃지 않게 됩니다.
+- **LangGraph**는 프로젝트 관리자(전체 흐름 관리)이며, **State**는 공유되는 프로젝트 문서입니다.
+- **`planning_node`**는 기획자(작업 분해)이며, **Interrupt**는 고객(사용자)의 중간 승인 회의입니다.
+- **`recommend_tool_node`**는 전문가 팀장(ReAct)이며, **RAG Tool**은 자체 구축된 지식 라이브러리(JSON, PDF)를 검색하는 전담 연구원입니다.
+- 최종적으로 **`guide_generation_node`**가 보고서(최종 가이드)를 작성하고, **`reflection_node`**는 고객의 요구사항(선호도)을 다음 프로젝트를 위해 기록해 두는 역할을 합니다.

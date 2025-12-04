@@ -18,7 +18,9 @@ from dotenv import load_dotenv
 from src.graph import (
     create_agent_graph,
     create_initial_state,
-    get_memory_manager
+    get_memory_manager,
+    handle_human_feedback,
+    resume_after_approval
 )
 from src.prompts import format_plan_summary
 
@@ -80,8 +82,9 @@ class ChatResponse(BaseModel):
     thread_id: str
     status: str
     message: str
+    is_complex: bool = False
     plan: Optional[list] = None
-    final_response: Optional[str] = None
+    final_guide: Optional[str] = None
 
 
 # ==================== 세션 관리 ====================
@@ -115,7 +118,7 @@ async def start_chat(request: ChatRequest):
         config = {"configurable": {"thread_id": thread_id}}
         initial_state = create_initial_state(request.query, request.user_id)
 
-        # Plan 단계까지 실행 (human_review 전에 interrupt)
+        # Plan 단계까지 실행 (recommend_tool_node 전에 interrupt)
         final_state = None
         for event in graph.stream(initial_state, config):
             for node_name, node_output in event.items():
@@ -124,10 +127,22 @@ async def start_chat(request: ChatRequest):
 
         # 현재 상태 조회
         state = graph.get_state(config)
-        subtasks = state.values.get("subtasks", [])
+        is_complex = state.values.get("is_complex_task", False)
+        sub_tasks = state.values.get("sub_tasks", [])
         plan_analysis = state.values.get("plan_analysis", "")
+        final_guide = state.values.get("final_guide")
 
-        # 세션 저장
+        # 단순 Q&A인 경우 바로 완료
+        if not is_complex and final_guide:
+            return ChatResponse(
+                thread_id=thread_id,
+                status="completed",
+                message="답변이 완료되었습니다.",
+                is_complex=False,
+                final_guide=final_guide
+            )
+
+        # 복잡한 작업: 세션 저장 및 승인 대기
         active_sessions[thread_id] = {
             "graph": graph,
             "config": config,
@@ -138,11 +153,8 @@ async def start_chat(request: ChatRequest):
             thread_id=thread_id,
             status="pending_approval",
             message=f"작업 계획을 수립했습니다.\n\n분석: {plan_analysis}\n\n승인하시겠습니까?",
-            plan=[{
-                "id": t.get("id"),
-                "description": t.get("description"),
-                "category": t.get("category")
-            } for t in subtasks]
+            is_complex=True,
+            plan=[{"id": f"task_{i+1}", "description": task} for i, task in enumerate(sub_tasks)]
         )
 
     except Exception as e:
@@ -164,42 +176,52 @@ async def approve_plan(request: ApproveRequest):
     config = session["config"]
 
     try:
-        # 사용자 응답으로 그래프 재개
-        user_response = {
-            "action": request.action,
-            "feedback": request.feedback or ""
-        }
+        # 사용자 응답 텍스트 구성
+        if request.action == "cancel":
+            user_response = "취소해"
+        elif request.action == "modify" and request.feedback:
+            user_response = request.feedback
+        else:
+            user_response = "승인"
 
-        # Command로 interrupt 재개
-        from langgraph.types import Command
+        # handle_human_feedback로 상태 업데이트
+        current_state = graph.get_state(config)
+        state_dict = dict(current_state.values)
+        updates = handle_human_feedback(state_dict, user_response)
 
-        final_state = None
-        for event in graph.stream(Command(resume=user_response), config):
+        # 취소인 경우
+        if updates.get("error") == "사용자 취소":
+            if thread_id in active_sessions:
+                del active_sessions[thread_id]
+            return ChatResponse(
+                thread_id=thread_id,
+                status="cancelled",
+                message="작업이 취소되었습니다.",
+                is_complex=True,
+                final_guide=None
+            )
+
+        # 상태 업데이트 후 실행 재개
+        graph.update_state(config, updates)
+
+        for event in graph.stream(None, config):
             for node_name, node_output in event.items():
                 print(f"[{thread_id}] Node: {node_name}")
-            final_state = event
 
         # 최종 상태 조회
         state = graph.get_state(config)
-        final_response = state.values.get("final_response", "")
+        final_guide = state.values.get("final_guide", "")
 
         # 세션 정리
         if thread_id in active_sessions:
             del active_sessions[thread_id]
 
-        if request.action == "cancel":
-            return ChatResponse(
-                thread_id=thread_id,
-                status="cancelled",
-                message="작업이 취소되었습니다.",
-                final_response=None
-            )
-
         return ChatResponse(
             thread_id=thread_id,
             status="completed",
             message="작업이 완료되었습니다.",
-            final_response=final_response
+            is_complex=True,
+            final_guide=final_guide
         )
 
     except Exception as e:
@@ -230,7 +252,7 @@ def create_gradio_ui():
         return start_new_conversation(message, history, user_id)
 
     def start_new_conversation(message: str, history: list, user_id: str):
-        """새 대화 시작 - Plan 생성"""
+        """새 대화 시작 - Plan 생성 또는 단순 Q&A 처리"""
         thread_id = str(uuid.uuid4())
 
         try:
@@ -238,15 +260,25 @@ def create_gradio_ui():
             config = {"configurable": {"thread_id": thread_id}}
             initial_state = create_initial_state(message, user_id or "gradio_user")
 
-            # Plan 단계까지 실행
+            # 그래프 실행 (interrupt까지 또는 완료까지)
             for event in graph.stream(initial_state, config):
                 pass
 
             state = graph.get_state(config)
-            subtasks = state.values.get("subtasks", [])
+            is_complex = state.values.get("is_complex_task", False)
+            sub_tasks = state.values.get("sub_tasks", [])
             plan_analysis = state.values.get("plan_analysis", "")
+            final_guide = state.values.get("final_guide")
 
-            # 세션 저장
+            # 히스토리 업데이트
+            history.append({"role": "user", "content": message})
+
+            # 단순 Q&A: 바로 응답
+            if not is_complex and final_guide:
+                history.append({"role": "assistant", "content": final_guide})
+                return history, None, "완료!"
+
+            # 복잡한 작업: 세션 저장 및 승인 대기
             active_sessions[thread_id] = {
                 "graph": graph,
                 "config": config,
@@ -255,12 +287,10 @@ def create_gradio_ui():
 
             # 계획 메시지 생성 (자연어 안내)
             plan_text = f"**작업 분석**\n{plan_analysis}\n\n**수립된 계획:**\n"
-            for task in subtasks:
-                plan_text += f"- **{task['id']}**: {task['description']} ({task['category']})\n"
+            for i, task in enumerate(sub_tasks, 1):
+                plan_text += f"- **task_{i}**: {task}\n"
             plan_text += "\n이대로 진행할까요? (예: '좋아 진행해', '취소해', '2번은 빼줘' 등으로 응답)"
 
-            # 히스토리 업데이트
-            history.append({"role": "user", "content": message})
             history.append({"role": "assistant", "content": plan_text})
 
             return history, thread_id, "계획 검토 중 - 자연어로 응답해주세요"
@@ -280,31 +310,36 @@ def create_gradio_ui():
         config = session["config"]
 
         try:
-            from langgraph.types import Command
-
             # 히스토리에 사용자 메시지 추가
             history.append({"role": "user", "content": message})
 
-            # 자연어 텍스트를 그대로 resume에 전달
-            # → human_review_node에서 LLM으로 의도 분석
-            for event in graph.stream(Command(resume=message), config):
+            # handle_human_feedback로 상태 업데이트
+            current_state = graph.get_state(config)
+            state_dict = dict(current_state.values)
+            updates = handle_human_feedback(state_dict, message)
+
+            # 취소인 경우
+            if updates.get("error") == "사용자 취소":
+                if thread_id in active_sessions:
+                    del active_sessions[thread_id]
+                history.append({"role": "assistant", "content": "작업이 취소되었습니다. 새로운 요청이 있으시면 말씀해주세요."})
+                return history, None, "취소됨"
+
+            # 상태 업데이트 후 실행 재개
+            graph.update_state(config, updates)
+
+            for event in graph.stream(None, config):
                 pass
 
             state = graph.get_state(config)
-            final_response = state.values.get("final_response", "")
-            plan_approved = state.values.get("plan_approved", False)
+            final_guide = state.values.get("final_guide", "")
 
             # 세션 정리
             if thread_id in active_sessions:
                 del active_sessions[thread_id]
 
-            if not plan_approved:
-                # 취소된 경우
-                history.append({"role": "assistant", "content": "작업이 취소되었습니다. 새로운 요청이 있으시면 말씀해주세요."})
-                return history, None, "취소됨"
-
             # 완료된 경우
-            history.append({"role": "assistant", "content": final_response})
+            history.append({"role": "assistant", "content": final_guide})
             return history, None, "완료!"
 
         except Exception as e:

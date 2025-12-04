@@ -52,3 +52,5 @@ logs/
 *.pt
 *.h5
 *.onnx
+
+.claude/

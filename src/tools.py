@@ -321,11 +321,223 @@ def hybrid_search(
     return all_results[:k], should_fallback
 
 
+# ==================== RAG 도구 (LLM 바인딩용) ====================
+
+# 메모리 매니저 싱글톤 (지연 로딩)
+_memory_manager = None
+
+
+def _get_memory_manager():
+    """메모리 매니저 싱글톤 반환"""
+    global _memory_manager
+    if _memory_manager is None:
+        from src.memory import MemoryManager
+        _memory_manager = MemoryManager(persist_dir="./db")
+    return _memory_manager
+
+
+@tool
+def retrieve_docs(query: str, category: Optional[str] = None) -> str:
+    """
+    AI 도구 지식베이스에서 관련 문서를 검색합니다.
+    JSON(기본 도구 정보)과 PDF(최신 트렌드)를 하이브리드로 검색합니다.
+
+    Args:
+        query: 검색 쿼리 (예: "유튜브 쇼츠 제작 AI", "이미지 생성 도구")
+        category: 도구 카테고리 필터 (선택사항)
+            - text-generation: 텍스트 생성
+            - image-generation: 이미지 생성
+            - video-generation: 비디오 생성
+            - audio-generation: 음성/음악 생성
+            - code-generation: 코드 생성
+            - productivity: 생산성 도구
+            - design: 디자인 도구
+            - research: 리서치 도구
+
+    Returns:
+        검색 결과 (JSON 문자열) - 도구명, 설명, 가격, 유사도 점수 포함
+    """
+    import json
+    memory = _get_memory_manager()
+
+    results, should_fallback = hybrid_search(
+        memory_manager=memory,
+        query=query,
+        k=5,
+        threshold=0.7,
+        category=category,
+        use_web_fallback=False,  # 웹 검색은 별도 도구로
+        include_pdf=True
+    )
+
+    # 결과 포맷팅
+    formatted_results = []
+    for r in results:
+        if r.get('source') == 'pdf':
+            formatted_results.append({
+                "type": "pdf_reference",
+                "content": r.get('content', '')[:500],  # 500자 제한
+                "filename": r.get('filename', ''),
+                "page": r.get('page', 0),
+                "score": r.get('score', 0)
+            })
+        else:
+            formatted_results.append({
+                "type": "ai_tool",
+                "name": r.get('name', ''),
+                "category": r.get('category', ''),
+                "description": r.get('description', ''),
+                "pricing": r.get('pricing', ''),
+                "monthly_price": r.get('monthly_price', 0),
+                "url": r.get('url', ''),
+                "score": r.get('score', 0)
+            })
+
+    return json.dumps({
+        "results": formatted_results,
+        "should_fallback": should_fallback,
+        "total_count": len(formatted_results)
+    }, ensure_ascii=False, indent=2)
+
+
+@tool
+def read_memory(user_id: str) -> str:
+    """
+    사용자의 장기 메모리(선호도, 히스토리)를 읽어옵니다.
+
+    Args:
+        user_id: 사용자 ID
+
+    Returns:
+        사용자 프로필 정보 (JSON 문자열)
+        - preferred_categories: 선호 카테고리
+        - price_preference: 가격 선호도
+        - interests: 관심 분야
+        - skill_level: 기술 수준
+    """
+    import json
+    memory = _get_memory_manager()
+    profile = memory.load_user_profile(user_id)
+
+    if profile:
+        return json.dumps(profile, ensure_ascii=False, indent=2)
+    else:
+        return json.dumps({"message": "사용자 프로필이 없습니다.", "user_id": user_id}, ensure_ascii=False)
+
+
+@tool
+def write_memory(user_id: str, preferences: str) -> str:
+    """
+    사용자의 선호도를 장기 메모리에 저장합니다.
+
+    Args:
+        user_id: 사용자 ID
+        preferences: 저장할 선호도 (JSON 문자열)
+            예: {"preferred_categories": ["video-generation"], "price_preference": "무료선호"}
+
+    Returns:
+        저장 결과 메시지
+    """
+    import json
+    memory = _get_memory_manager()
+
+    try:
+        prefs = json.loads(preferences)
+        success = memory.save_user_profile(user_id, prefs)
+
+        if success:
+            return json.dumps({
+                "status": "success",
+                "message": f"사용자 {user_id}의 프로필이 저장되었습니다.",
+                "saved_data": prefs
+            }, ensure_ascii=False)
+        else:
+            return json.dumps({
+                "status": "error",
+                "message": "프로필 저장에 실패했습니다."
+            }, ensure_ascii=False)
+
+    except json.JSONDecodeError as e:
+        return json.dumps({
+            "status": "error",
+            "message": f"JSON 파싱 오류: {str(e)}"
+        }, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "status": "error",
+            "message": f"저장 오류: {str(e)}"
+        }, ensure_ascii=False)
+
+
+@tool
+def google_search_tool(query: str, num_results: int = 3) -> str:
+    """
+    Google에서 최신 정보를 검색합니다.
+    지식베이스에 없는 최신 AI 도구나 트렌드를 찾을 때 사용합니다.
+
+    Args:
+        query: 검색 쿼리 (예: "2024 최신 AI 영상 편집 도구")
+        num_results: 반환할 결과 수 (기본 3개, 최대 10개)
+
+    Returns:
+        검색 결과 (JSON 문자열) - 제목, 설명, URL 포함
+    """
+    import json
+
+    if not google_search.is_available:
+        return json.dumps({
+            "status": "error",
+            "message": "Google Search API가 설정되지 않았습니다.",
+            "results": []
+        }, ensure_ascii=False)
+
+    results = google_search.search(query, num_results=min(num_results, 10))
+
+    return json.dumps({
+        "status": "success",
+        "query": query,
+        "results": results,
+        "total_count": len(results)
+    }, ensure_ascii=False, indent=2)
+
+
+# ==================== 도구 실행 헬퍼 ====================
+
+def execute_tool(tool_name: str, args: dict) -> Any:
+    """
+    도구 이름으로 실행
+
+    Args:
+        tool_name: 도구 이름
+        args: 도구 인자 딕셔너리
+
+    Returns:
+        도구 실행 결과
+    """
+    tools_map = {
+        "retrieve_docs": retrieve_docs,
+        "read_memory": read_memory,
+        "write_memory": write_memory,
+        "google_search_tool": google_search_tool,
+        "calculate_subscription_cost": calculate_subscription_cost,
+        "check_tool_freshness": check_tool_freshness
+    }
+
+    tool_func = tools_map.get(tool_name)
+    if tool_func:
+        return tool_func.invoke(args)
+    raise ValueError(f"알 수 없는 도구: {tool_name}")
+
+
 # ==================== 도구 리스트 ====================
 
 def get_all_tools() -> List:
-    """LangChain 도구 리스트 반환"""
+    """LangChain 도구 리스트 반환 (LLM 바인딩용)"""
     return [
+        retrieve_docs,
+        read_memory,
+        write_memory,
+        google_search_tool,
         calculate_subscription_cost,
         check_tool_freshness
     ]
