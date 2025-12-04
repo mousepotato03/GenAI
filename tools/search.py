@@ -1,142 +1,14 @@
 """
-Tools - Calculator, Time, Google Search 도구 정의
+Search Tools - RAG 검색 및 웹 검색 도구
 """
 import os
-from typing import List, Dict, Optional, Any
-from datetime import datetime
+import json
+from typing import List, Dict, Optional
 
 from langchain_core.tools import tool
 from dotenv import load_dotenv
 
 load_dotenv()
-
-
-# ==================== Calculator Tool ====================
-
-@tool
-def calculate_subscription_cost(tool_names: List[str], tool_prices: List[float]) -> str:
-    """
-    선택된 AI 도구들의 월간 구독료를 합산합니다.
-
-    Args:
-        tool_names: 도구 이름 리스트
-        tool_prices: 각 도구의 월간 가격 리스트 (USD)
-
-    Returns:
-        구독료 합산 결과 문자열
-    """
-    if len(tool_names) != len(tool_prices):
-        return "오류: 도구 이름과 가격 리스트의 길이가 일치하지 않습니다."
-
-    total = sum(tool_prices)
-    yearly = total * 12
-
-    result_lines = ["## 📊 월간 구독료 계산 결과\n"]
-
-    for name, price in zip(tool_names, tool_prices):
-        if price == 0:
-            result_lines.append(f"- **{name}**: 무료")
-        else:
-            result_lines.append(f"- **{name}**: ${price:.2f}/월")
-
-    result_lines.append(f"\n### 💰 총 비용")
-    result_lines.append(f"- **월간**: ${total:.2f}")
-    result_lines.append(f"- **연간**: ${yearly:.2f}")
-
-    if total > 50:
-        result_lines.append(f"\n> ⚠️ 월 $50 이상의 비용이 예상됩니다. 무료 대안을 고려해보세요.")
-
-    return "\n".join(result_lines)
-
-
-def calculate_tools_cost(tools: List[Dict]) -> Dict:
-    """
-    도구 리스트에서 비용 계산 (내부 함수)
-
-    Args:
-        tools: 도구 정보 딕셔너리 리스트
-
-    Returns:
-        비용 정보 딕셔너리
-    """
-    total_monthly = 0
-    breakdown = []
-
-    for tool in tools:
-        price = tool.get('monthly_price', 0)
-        name = tool.get('name', 'Unknown')
-        total_monthly += price
-        breakdown.append({
-            "name": name,
-            "monthly_price": price
-        })
-
-    return {
-        "total_monthly": total_monthly,
-        "total_yearly": total_monthly * 12,
-        "breakdown": breakdown
-    }
-
-
-# ==================== Time Tool ====================
-
-@tool
-def check_tool_freshness(tool_name: str, updated_date: str) -> str:
-    """
-    AI 도구 정보의 최신성을 확인합니다.
-
-    Args:
-        tool_name: 도구 이름
-        updated_date: 도구 정보 업데이트 날짜 (YYYY-MM-DD 형식)
-
-    Returns:
-        최신 여부 판단 결과
-    """
-    try:
-        today = datetime.now()
-        update_dt = datetime.strptime(updated_date, "%Y-%m-%d")
-        days_old = (today - update_dt).days
-
-        if days_old <= 30:
-            return f"✅ '{tool_name}' 정보는 최신입니다. ({days_old}일 전 업데이트)"
-        elif days_old <= 90:
-            return f"⚠️ '{tool_name}' 정보가 다소 오래되었습니다. ({days_old}일 전 업데이트) 공식 사이트에서 최신 정보를 확인하세요."
-        else:
-            return f"❌ '{tool_name}' 정보가 오래되었습니다. ({days_old}일 전 업데이트) 반드시 공식 사이트에서 확인하세요."
-
-    except ValueError:
-        return f"⚠️ '{tool_name}'의 업데이트 날짜 형식이 올바르지 않습니다."
-
-
-def get_current_time() -> str:
-    """현재 시간 반환"""
-    now = datetime.now()
-    return now.strftime("%Y-%m-%d %H:%M:%S")
-
-
-def check_freshness_simple(updated_date: str) -> Dict:
-    """
-    최신 여부를 간단히 확인 (내부 함수)
-
-    Returns:
-        {"is_fresh": bool, "days_old": int, "message": str}
-    """
-    try:
-        today = datetime.now()
-        update_dt = datetime.strptime(updated_date, "%Y-%m-%d")
-        days_old = (today - update_dt).days
-
-        return {
-            "is_fresh": days_old <= 30,
-            "days_old": days_old,
-            "message": "최신" if days_old <= 30 else "확인 필요"
-        }
-    except:
-        return {
-            "is_fresh": False,
-            "days_old": -1,
-            "message": "날짜 형식 오류"
-        }
 
 
 # ==================== Google Search ====================
@@ -331,8 +203,8 @@ def _get_memory_manager():
     """메모리 매니저 싱글톤 반환"""
     global _memory_manager
     if _memory_manager is None:
-        from src.memory import MemoryManager
-        _memory_manager = MemoryManager(persist_dir="./db")
+        from core.memory import MemoryManager
+        _memory_manager = MemoryManager()
     return _memory_manager
 
 
@@ -357,7 +229,6 @@ def retrieve_docs(query: str, category: Optional[str] = None) -> str:
     Returns:
         검색 결과 (JSON 문자열) - 도구명, 설명, 가격, 유사도 점수 포함
     """
-    import json
     memory = _get_memory_manager()
 
     results, should_fallback = hybrid_search(
@@ -401,75 +272,6 @@ def retrieve_docs(query: str, category: Optional[str] = None) -> str:
 
 
 @tool
-def read_memory(user_id: str) -> str:
-    """
-    사용자의 장기 메모리(선호도, 히스토리)를 읽어옵니다.
-
-    Args:
-        user_id: 사용자 ID
-
-    Returns:
-        사용자 프로필 정보 (JSON 문자열)
-        - preferred_categories: 선호 카테고리
-        - price_preference: 가격 선호도
-        - interests: 관심 분야
-        - skill_level: 기술 수준
-    """
-    import json
-    memory = _get_memory_manager()
-    profile = memory.load_user_profile(user_id)
-
-    if profile:
-        return json.dumps(profile, ensure_ascii=False, indent=2)
-    else:
-        return json.dumps({"message": "사용자 프로필이 없습니다.", "user_id": user_id}, ensure_ascii=False)
-
-
-@tool
-def write_memory(user_id: str, preferences: str) -> str:
-    """
-    사용자의 선호도를 장기 메모리에 저장합니다.
-
-    Args:
-        user_id: 사용자 ID
-        preferences: 저장할 선호도 (JSON 문자열)
-            예: {"preferred_categories": ["video-generation"], "price_preference": "무료선호"}
-
-    Returns:
-        저장 결과 메시지
-    """
-    import json
-    memory = _get_memory_manager()
-
-    try:
-        prefs = json.loads(preferences)
-        success = memory.save_user_profile(user_id, prefs)
-
-        if success:
-            return json.dumps({
-                "status": "success",
-                "message": f"사용자 {user_id}의 프로필이 저장되었습니다.",
-                "saved_data": prefs
-            }, ensure_ascii=False)
-        else:
-            return json.dumps({
-                "status": "error",
-                "message": "프로필 저장에 실패했습니다."
-            }, ensure_ascii=False)
-
-    except json.JSONDecodeError as e:
-        return json.dumps({
-            "status": "error",
-            "message": f"JSON 파싱 오류: {str(e)}"
-        }, ensure_ascii=False)
-    except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "message": f"저장 오류: {str(e)}"
-        }, ensure_ascii=False)
-
-
-@tool
 def google_search_tool(query: str, num_results: int = 3) -> str:
     """
     Google에서 최신 정보를 검색합니다.
@@ -482,8 +284,6 @@ def google_search_tool(query: str, num_results: int = 3) -> str:
     Returns:
         검색 결과 (JSON 문자열) - 제목, 설명, URL 포함
     """
-    import json
-
     if not google_search.is_available:
         return json.dumps({
             "status": "error",
@@ -499,69 +299,3 @@ def google_search_tool(query: str, num_results: int = 3) -> str:
         "results": results,
         "total_count": len(results)
     }, ensure_ascii=False, indent=2)
-
-
-# ==================== 도구 실행 헬퍼 ====================
-
-def execute_tool(tool_name: str, args: dict) -> Any:
-    """
-    도구 이름으로 실행
-
-    Args:
-        tool_name: 도구 이름
-        args: 도구 인자 딕셔너리
-
-    Returns:
-        도구 실행 결과
-    """
-    tools_map = {
-        "retrieve_docs": retrieve_docs,
-        "read_memory": read_memory,
-        "write_memory": write_memory,
-        "google_search_tool": google_search_tool,
-        "calculate_subscription_cost": calculate_subscription_cost,
-        "check_tool_freshness": check_tool_freshness
-    }
-
-    tool_func = tools_map.get(tool_name)
-    if tool_func:
-        return tool_func.invoke(args)
-    raise ValueError(f"알 수 없는 도구: {tool_name}")
-
-
-# ==================== 도구 리스트 ====================
-
-def get_all_tools() -> List:
-    """LangChain 도구 리스트 반환 (LLM 바인딩용)"""
-    return [
-        retrieve_docs,
-        read_memory,
-        write_memory,
-        google_search_tool,
-        calculate_subscription_cost,
-        check_tool_freshness
-    ]
-
-
-# 테스트용 코드
-if __name__ == "__main__":
-    # Calculator 테스트
-    result = calculate_subscription_cost.invoke({
-        "tool_names": ["ChatGPT", "Midjourney", "ElevenLabs"],
-        "tool_prices": [20.0, 30.0, 22.0]
-    })
-    print(result)
-
-    print("\n" + "=" * 50 + "\n")
-
-    # Time 테스트
-    result = check_tool_freshness.invoke({
-        "tool_name": "ChatGPT",
-        "updated_date": "2024-11-01"
-    })
-    print(result)
-
-    print("\n" + "=" * 50 + "\n")
-
-    # 현재 시간
-    print(f"현재 시간: {get_current_time()}")

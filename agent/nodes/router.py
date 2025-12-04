@@ -1,0 +1,62 @@
+"""
+LLM Router Node - 질문 유형 분류
+"""
+import json
+from typing import Dict
+
+from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
+
+from agent.state import AgentState
+from core.llm import get_llm
+from core.memory import get_memory_manager
+from prompts.router import LLM_ROUTER_SYSTEM_PROMPT, LLM_ROUTER_USER_TEMPLATE
+from prompts.formatters import format_user_profile
+
+
+def llm_router_node(state: AgentState) -> Dict:
+    """
+    [작업 1] 질문 유형 분류 - Entry Point
+
+    사용자 질문이 단순 Q&A인지 복잡한 작업인지 판단합니다.
+    """
+    print("[Node] llm_router 실행")
+
+    llm = get_llm(temperature=0.1)
+    user_query = state.get("user_query", "")
+
+    # 사용자 프로필 로드
+    memory = get_memory_manager()
+    user_id = state.get("user_id", "default_user")
+    user_profile = memory.load_user_profile(user_id)
+
+    user_prompt = LLM_ROUTER_USER_TEMPLATE.format(
+        user_query=user_query,
+        user_profile=format_user_profile(user_profile)
+    )
+
+    response = llm.invoke([
+        SystemMessage(content=LLM_ROUTER_SYSTEM_PROMPT),
+        HumanMessage(content=user_prompt)
+    ])
+
+    try:
+        response_text = response.content.strip()
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0]
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0]
+
+        result = json.loads(response_text)
+        is_complex = result.get("is_complex", False)
+        reason = result.get("reason", "")
+        print(f"  - 분류 결과: {'복잡한 작업' if is_complex else '단순 Q&A'}")
+        print(f"  - 이유: {reason}")
+    except Exception as e:
+        print(f"  - 분류 파싱 오류: {e}, 기본값: 복잡한 작업")
+        is_complex = True
+
+    return {
+        "is_complex_task": is_complex,
+        "user_profile": user_profile,
+        "messages": [AIMessage(content=f"[시스템] 질문 유형: {'복잡한 작업' if is_complex else '단순 Q&A'}")]
+    }

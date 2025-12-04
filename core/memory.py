@@ -4,31 +4,32 @@ Memory Manager - ChromaDB 기반 벡터 저장소 및 사용자 프로필 관리
 import json
 import os
 import glob
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 from datetime import datetime
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import chromadb
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
+
+from core.config import DB_PATH
 
 
 class MemoryManager:
     """ChromaDB를 활용한 RAG 및 장기 메모리 관리 클래스"""
 
-    def __init__(self, persist_dir: str = "./db"):
+    def __init__(self, persist_dir: str = None):
         """
         Args:
             persist_dir: ChromaDB 영구 저장소 경로
         """
-        self.persist_dir = persist_dir
+        self.persist_dir = persist_dir or DB_PATH
 
         # ChromaDB 클라이언트 초기화 (Persistent)
-        self.client = chromadb.PersistentClient(path=persist_dir)
+        self.client = chromadb.PersistentClient(path=self.persist_dir)
 
         # 임베딩 모델 초기화 (다국어 지원)
         self.embedding_model = SentenceTransformer(
@@ -497,24 +498,13 @@ class MemoryManager:
         return self.pdf_collection.count()
 
 
-# 테스트용 코드
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
+# 메모리 매니저 싱글톤
+_memory_manager = None
 
-    load_dotenv()
 
-    # 메모리 매니저 초기화
-    memory = MemoryManager(persist_dir="./db")
-
-    # AI 도구 데이터 로드
-    json_path = "./data/tools_base.json"
-    if os.path.exists(json_path):
-        count = memory.load_tools_from_json(json_path)
-        print(f"로드된 도구 수: {count}")
-
-    # 검색 테스트
-    results, fallback = memory.search_tools("유튜브 쇼츠 만들기", k=3)
-    print(f"\n검색 결과 (Fallback: {fallback}):")
-    for r in results:
-        print(f"  - {r['name']}: {r['score']:.3f}")
+def get_memory_manager() -> MemoryManager:
+    """메모리 매니저 싱글톤 반환"""
+    global _memory_manager
+    if _memory_manager is None:
+        _memory_manager = MemoryManager()
+    return _memory_manager
