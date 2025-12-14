@@ -38,7 +38,9 @@ def create_gradio_ui(active_sessions: Dict):
 
         try:
             graph = create_agent_graph()
-            config = {"configurable": {"thread_id": thread_id}}
+
+            # 그래프 이동 최대 횟수 지정
+            config = {"recursion_limit": 60, "configurable": {"thread_id": thread_id}}  
             initial_state = create_initial_state(message, user_id or "gradio_user")
 
             # 그래프 실행 (interrupt까지 또는 완료까지)
