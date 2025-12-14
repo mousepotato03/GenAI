@@ -41,34 +41,76 @@ def tool_executor_node(state: AgentState) -> Dict:
         print(f"  - 결과 길이: {len(observation)} chars")
 
         # retrieved_docs 업데이트 (검색 결과인 경우)
+        task_completed = False  # should_fallback: False이면 태스크 완료 처리
+
         if tool_name in ["retrieve_docs", "google_search_tool"]:
             try:
                 result_data = json.loads(observation)
-                docs = result_data.get("results", [])
-                if isinstance(docs, list):
-                    retrieved_docs.extend(docs)
-                    print(f"  - retrieved_docs에 {len(docs)}개 추가")
 
-                    # 유사도 점수 출력
-                    print(f"  - [유사도 점수]")
-                    for doc in docs:
-                        score = doc.get("score", 0)
-                        name = doc.get("name", doc.get("content", "")[:30])
-                        doc_type = doc.get("type", "unknown")
-                        print(f"    • {name}: {score:.4f} ({doc_type})")
+                # retrieve_docs: 2단계 점수 합산 방식 (recommended_tool + candidates)
+                if "recommended_tool" in result_data:
+                    recommended = result_data.get("recommended_tool")
+                    candidates = result_data.get("candidates", [])
 
-                    # should_fallback 상태 출력
+                    if recommended:
+                        retrieved_docs.append(recommended)
+                        print(f"  - retrieved_docs에 추천 도구 1개 추가")
+
+                        # 점수 출력
+                        scores = recommended.get("scores", {})
+                        print(f"  - [추천 도구] {recommended.get('name')}")
+                        print(f"    • json_score: {scores.get('json_score', 0):.3f}")
+                        print(f"    • pdf_score: {scores.get('pdf_score', 0):.3f}")
+                        print(f"    • final_score: {scores.get('final_score', 0):.3f}")
+
+                        # 후보군 출력
+                        if candidates:
+                            print(f"  - [후보군]")
+                            for c in candidates[:3]:
+                                print(f"    • {c.get('name')}: {c.get('final_score', 0):.3f}")
+
+                    # should_fallback 상태 출력 및 태스크 완료 판단
                     should_fallback = result_data.get("should_fallback", False)
                     print(f"  - should_fallback: {should_fallback} (threshold 미달 여부)")
+
+                    if not should_fallback:
+                        task_completed = True  # 충분한 결과 → 태스크 완료
+
+                # google_search_tool: 기존 방식 (results 리스트)
+                else:
+                    docs = result_data.get("results", [])
+                    if isinstance(docs, list):
+                        retrieved_docs.extend(docs)
+                        print(f"  - retrieved_docs에 {len(docs)}개 추가")
+
+                        # 유사도 점수 출력
+                        print(f"  - [유사도 점수]")
+                        for doc in docs:
+                            score = doc.get("score", 0)
+                            name = doc.get("name", doc.get("content", "")[:30])
+                            print(f"    • {name}: {score:.4f}")
+
+                        # should_fallback 상태 출력
+                        should_fallback = result_data.get("should_fallback", False)
+                        print(f"  - should_fallback: {should_fallback} (threshold 미달 여부)")
             except:
                 pass
 
         # ToolMessage로 Observation 반환
-        return {
+        result = {
             "retrieved_docs": retrieved_docs,
             "messages": [ToolMessage(content=observation, tool_call_id=tool_id)],
             "tool_result": None  # 다음 루프를 위해 초기화
         }
+
+        # should_fallback: False이면 충분한 결과 → 다음 태스크로 이동
+        if task_completed:
+            current_idx = state.get("current_task_idx", 0)
+            result["current_task_idx"] = current_idx + 1
+            result["tool_call_count"] = 0  # 다음 태스크를 위해 초기화
+            print(f"  - 충분한 결과 획득, 다음 태스크로 이동 (idx: {current_idx} → {current_idx + 1})")
+
+        return result
 
     except Exception as e:
         print(f"  - 도구 실행 오류: {e}")

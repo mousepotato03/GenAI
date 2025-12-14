@@ -17,9 +17,11 @@ from agent.nodes import (
     recommend_tool_node,
     tool_executor_node,
     guide_generation_node,
-    reflection_node
+    reflection_node,
+    simple_llm_node,
+    simple_tool_executor
 )
-from agent.routing import route_after_llm_router, route_after_recommend
+from agent.routing import route_after_llm_router, route_after_recommend, route_after_simple_llm
 from agent.hitl import handle_human_feedback
 
 
@@ -40,6 +42,8 @@ def create_initial_state(user_query: str, user_id: str = "default_user") -> Agen
         "plan_analysis": "",
         "current_task_idx": 0,
         "tool_call_count": 0,
+        "simple_tool_count": 0,
+        "final_answer": None,
         "created_at": datetime.now().isoformat(),
         "error": None
     }
@@ -60,6 +64,10 @@ def create_agent_graph():
     workflow.add_node("guide_generation_node", guide_generation_node)
     workflow.add_node("reflection_node", reflection_node)
 
+    # ===== 단순 질문용 ReAct 노드 =====
+    workflow.add_node("simple_llm_node", simple_llm_node)
+    workflow.add_node("simple_executor", simple_tool_executor)
+
     # ===== Entry Point =====
     workflow.set_entry_point("llm_router")
 
@@ -69,9 +77,20 @@ def create_agent_graph():
         route_after_llm_router,
         {
             "planning_node": "planning_node",
-            "guide_generation_node": "guide_generation_node"
+            "simple_llm_node": "simple_llm_node"  # 단순 질문 -> ReAct 패턴
         }
     )
+
+    # ===== 단순 질문 ReAct 루프 =====
+    workflow.add_conditional_edges(
+        "simple_llm_node",
+        route_after_simple_llm,
+        {
+            "simple_executor": "simple_executor",
+            "reflection_node": "reflection_node"
+        }
+    )
+    workflow.add_edge("simple_executor", "simple_llm_node")  # 루프백
 
     # ===== planning -> human_approval -> recommend =====
     workflow.add_edge("planning_node", "human_approval_node")

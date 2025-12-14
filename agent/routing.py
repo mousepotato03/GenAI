@@ -9,7 +9,18 @@ def route_after_llm_router(state: AgentState) -> str:
     if state.get("is_complex_task", False):
         return "planning_node"
     else:
-        return "guide_generation_node"
+        return "simple_llm_node"  # 단순 질문 -> ReAct 패턴
+
+
+def route_after_simple_llm(state: AgentState) -> str:
+    """simple_llm_node 후 라우팅 (단순 질문 ReAct 루프)"""
+    tool_result = state.get("tool_result")
+
+    if tool_result is not None:
+        return "simple_executor"
+    else:
+        # 최종 답변 완료 -> reflection으로
+        return "reflection_node"
 
 
 def route_after_recommend(state: AgentState) -> str:

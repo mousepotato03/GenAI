@@ -18,7 +18,7 @@ DB_PATH = os.getenv("DB_PATH", "./db")
 DATA_PATH = os.getenv("DATA_PATH", "./data")
 
 # JSON 데이터 경로
-TOOLS_JSON_PATH = os.path.join(DATA_PATH, "ai_tools_2025.json")
+TOOLS_JSON_PATH = os.path.join(DATA_PATH, "ai_tools.json")
 
 # 서버 설정
 HOST = os.getenv("HOST", "0.0.0.0")

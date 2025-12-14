@@ -45,7 +45,7 @@ def calculate_subscription_cost(tool_names: List[str], tool_prices: List[float])
 
 def calculate_tools_cost(tools: List[Dict]) -> Dict:
     """
-    도구 리스트에서 비용 계산 (내부 함수)
+    도구 리스트에서 비용 정보 수집 (내부 함수)
 
     Args:
         tools: 도구 정보 딕셔너리 리스트
@@ -53,22 +53,22 @@ def calculate_tools_cost(tools: List[Dict]) -> Dict:
     Returns:
         비용 정보 딕셔너리
     """
-    total_monthly = 0
     breakdown = []
 
     for tool in tools:
-        price = tool.get('monthly_price', 0)
         name = tool.get('name', 'Unknown')
-        total_monthly += price
+        pricing_model = tool.get('pricing_model', '')
+        pricing_notes = tool.get('pricing_notes', '')
+
         breakdown.append({
             "name": name,
-            "monthly_price": price
+            "pricing_model": pricing_model,
+            "pricing_notes": pricing_notes
         })
 
     return {
-        "total_monthly": total_monthly,
-        "total_yearly": total_monthly * 12,
-        "breakdown": breakdown
+        "breakdown": breakdown,
+        "note": "정확한 비용은 각 서비스 공식 사이트에서 확인하세요."
     }
 
 
@@ -100,8 +100,15 @@ def check_tool_freshness(tool_name: str, updated_date: str) -> str:
         return f"⚠️ '{tool_name}'의 업데이트 날짜 형식이 올바르지 않습니다."
 
 
+@tool
 def get_current_time() -> str:
-    """현재 시간 반환"""
+    """
+    현재 날짜와 시간을 반환합니다.
+    도구 정보의 최신성을 확인하거나 시간 관련 정보가 필요할 때 사용하세요.
+
+    Returns:
+        현재 날짜/시간 문자열 (YYYY-MM-DD HH:MM:SS 형식)
+    """
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")
 

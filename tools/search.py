@@ -124,17 +124,108 @@ def web_search(query: str, category: Optional[str] = None) -> List[Dict]:
 
 # ==================== 통합 검색 함수 ====================
 
+# 점수 가중치 설정
+JSON_WEIGHT = 0.7  # JSON 검색 점수 가중치
+PDF_WEIGHT = 0.3   # PDF 검색 점수 가중치
+
+
+def two_stage_search(
+    memory_manager,
+    query: str,
+    num_candidates: int = 5,
+    threshold: float = 0.4,
+    category: Optional[str] = None,
+    use_web_fallback: bool = True
+) -> tuple[Optional[Dict], List[Dict], bool]:
+    """
+    2단계 점수 합산 방식 검색
+
+    1단계: JSON 기반 벡터 유사도 검색 → 후보군 추출 (json_score)
+    2단계: 각 후보에 대해 PDF 검색 → 추가 점수 부여 (pdf_score)
+    최종: final_score = json_score * 0.7 + pdf_score * 0.3 → 최고 점수 1개 반환
+
+    Args:
+        memory_manager: MemoryManager 인스턴스
+        query: 검색 쿼리
+        num_candidates: 1단계에서 추출할 후보 수
+        threshold: 유사도 임계값
+        category: 카테고리 필터
+        use_web_fallback: 웹 검색 폴백 사용 여부
+
+    Returns:
+        (최고 점수 도구, 전체 후보 리스트, fallback 발동 여부)
+    """
+    # ========== 1단계: JSON 검색으로 후보군 추출 ==========
+    rag_results, should_fallback = memory_manager.search_tools(
+        query=query,
+        k=num_candidates,
+        threshold=threshold,
+        category=category
+    )
+
+    if not rag_results:
+        # 후보가 없으면 웹 검색 폴백
+        if use_web_fallback and google_search.is_available:
+            print(f"RAG 결과 없음, 웹 검색 실행...")
+            web_results = google_search.search(query, num_results=3, category=category)
+            if web_results:
+                # 웹 검색 결과는 점수 계산 없이 첫 번째 반환
+                top_result = web_results[0]
+                top_result["source"] = "web"
+                top_result["scores"] = {
+                    "json_score": 0,
+                    "pdf_score": 0,
+                    "final_score": 0.5  # 웹 검색 기본 점수
+                }
+                return top_result, web_results, True
+        return None, [], True
+
+    # ========== 2단계: 각 후보에 대해 PDF 검색으로 추가 점수 ==========
+    candidates = []
+    for tool in rag_results:
+        tool_name = tool.get("name", "")
+        categories = tool.get("categories", "")
+        json_score = tool.get("score", 0)
+
+        # PDF에서 해당 도구 관련도 점수 계산
+        pdf_score = memory_manager.search_pdf_for_tool(
+            tool_name=tool_name,
+            categories=categories,
+            k=3
+        )
+
+        # 최종 점수 계산: JSON 70% + PDF 30%
+        final_score = (json_score * JSON_WEIGHT) + (pdf_score * PDF_WEIGHT)
+
+        # 결과에 점수 정보 추가
+        tool["source"] = "json"
+        tool["scores"] = {
+            "json_score": round(json_score, 3),
+            "pdf_score": round(pdf_score, 3),
+            "final_score": round(final_score, 3)
+        }
+        candidates.append(tool)
+
+    # ========== 3단계: 최고 점수 도구 선택 ==========
+    candidates.sort(key=lambda x: x["scores"]["final_score"], reverse=True)
+    top_tool = candidates[0] if candidates else None
+
+    return top_tool, candidates, should_fallback
+
+
 def hybrid_search(
     memory_manager,
     query: str,
     k: int = 5,
-    threshold: float = 0.7,
+    threshold: float = 0.4,
     category: Optional[str] = None,
     use_web_fallback: bool = True,
     include_pdf: bool = True
 ) -> tuple[List[Dict], bool]:
     """
-    하이브리드 검색: RAG (JSON + PDF) + Web Search
+    하이브리드 검색 (기존 호환성 유지)
+
+    내부적으로 two_stage_search를 사용하여 2단계 점수 합산 방식 적용
 
     Args:
         memory_manager: MemoryManager 인스턴스
@@ -143,54 +234,21 @@ def hybrid_search(
         threshold: 유사도 임계값
         category: 카테고리 필터
         use_web_fallback: 웹 검색 폴백 사용 여부
-        include_pdf: PDF 지식베이스 검색 포함 여부
+        include_pdf: PDF 지식베이스 검색 포함 여부 (현재는 항상 2단계로 사용)
 
     Returns:
         (검색 결과 리스트, fallback 발동 여부)
     """
-    all_results = []
-
-    # 1. JSON 도구 검색 (ChromaDB - ai_tools 컬렉션)
-    rag_results, should_fallback = memory_manager.search_tools(
+    top_tool, candidates, should_fallback = two_stage_search(
+        memory_manager=memory_manager,
         query=query,
-        k=k,
+        num_candidates=k,
         threshold=threshold,
-        category=category
+        category=category,
+        use_web_fallback=use_web_fallback
     )
 
-    # source 표시 추가
-    for r in rag_results:
-        r["source"] = "json"
-    all_results.extend(rag_results)
-
-    # 2. PDF 지식베이스 검색 (ChromaDB - pdf_knowledge 컬렉션)
-    if include_pdf:
-        pdf_results = memory_manager.search_pdf_knowledge(
-            query=query,
-            k=3,
-            threshold=0.03
-        )
-        all_results.extend(pdf_results)
-
-    # 3. Fallback 조건 확인 및 웹 검색
-    if should_fallback and use_web_fallback and google_search.is_available:
-        print(f"RAG 결과 부족 (threshold: {threshold}), 웹 검색 실행...")
-        web_results = google_search.search(query, num_results=3, category=category)
-
-        # source 표시 추가
-        for wr in web_results:
-            wr["source"] = "web"
-
-        # 결과 병합 (중복 제거)
-        existing_names = {r.get('name', '').lower() for r in all_results if r.get('name')}
-        for wr in web_results:
-            if wr.get('name', '').lower() not in existing_names:
-                all_results.append(wr)
-
-    # 점수순 정렬
-    all_results.sort(key=lambda x: x.get('score', 0), reverse=True)
-
-    return all_results[:k], should_fallback
+    return candidates[:k], should_fallback
 
 
 # ==================== RAG 도구 (LLM 바인딩용) ====================
@@ -211,8 +269,8 @@ def _get_memory_manager():
 @tool
 def retrieve_docs(query: str, category: Optional[str] = None) -> str:
     """
-    AI 도구 지식베이스에서 관련 문서를 검색합니다.
-    JSON(기본 도구 정보)과 PDF(최신 트렌드)를 하이브리드로 검색합니다.
+    AI 도구 지식베이스에서 최적의 도구를 검색합니다.
+    2단계 점수 합산 방식: JSON(70%) + PDF(30%) 점수로 최고 점수 1개 도구 추천
 
     Args:
         query: 검색 쿼리 (예: "유튜브 쇼츠 제작 AI", "이미지 생성 도구")
@@ -227,47 +285,48 @@ def retrieve_docs(query: str, category: Optional[str] = None) -> str:
             - research: 리서치 도구
 
     Returns:
-        검색 결과 (JSON 문자열) - 도구명, 설명, 가격, 유사도 점수 포함
+        검색 결과 (JSON 문자열) - 최고 점수 도구 + 후보군 정보
     """
     memory = _get_memory_manager()
 
-    results, should_fallback = hybrid_search(
+    # 2단계 점수 합산 검색
+    top_tool, candidates, should_fallback = two_stage_search(
         memory_manager=memory,
         query=query,
-        k=5,
-        threshold=0.7,
+        num_candidates=5,
+        threshold=0.4,
         category=category,
-        use_web_fallback=False,  # 웹 검색은 별도 도구로
-        include_pdf=True
+        use_web_fallback=False  # 웹 검색은 별도 도구로
     )
 
     # 결과 포맷팅
-    formatted_results = []
-    for r in results:
-        if r.get('source') == 'pdf':
-            formatted_results.append({
-                "type": "pdf_reference",
-                "content": r.get('content', '')[:500],  # 500자 제한
-                "filename": r.get('filename', ''),
-                "page": r.get('page', 0),
-                "score": r.get('score', 0)
-            })
-        else:
-            formatted_results.append({
-                "type": "ai_tool",
-                "name": r.get('name', ''),
-                "category": r.get('category', ''),
-                "description": r.get('description', ''),
-                "pricing": r.get('pricing', ''),
-                "monthly_price": r.get('monthly_price', 0),
-                "url": r.get('url', ''),
-                "score": r.get('score', 0)
-            })
+    if top_tool:
+        recommended_tool = {
+            "name": top_tool.get('name', ''),
+            "description": top_tool.get('description', ''),
+            "categories": top_tool.get('categories', ''),
+            "domains": top_tool.get('domains', ''),
+            "pricing_model": top_tool.get('pricing_model', ''),
+            "pricing_notes": top_tool.get('pricing_notes', ''),
+            "scores": top_tool.get('scores', {})
+        }
+    else:
+        recommended_tool = None
+
+    # 후보군 요약 (이름과 점수만)
+    candidates_summary = [
+        {
+            "name": c.get('name', ''),
+            "final_score": c.get('scores', {}).get('final_score', 0)
+        }
+        for c in candidates
+    ]
 
     return json.dumps({
-        "results": formatted_results,
+        "recommended_tool": recommended_tool,
+        "candidates": candidates_summary,
         "should_fallback": should_fallback,
-        "total_count": len(formatted_results)
+        "scoring_method": "JSON 70% + PDF 30%"
     }, ensure_ascii=False, indent=2)
 
 

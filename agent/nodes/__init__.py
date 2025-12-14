@@ -6,6 +6,8 @@ from agent.nodes.recommend import recommend_tool_node
 from agent.nodes.executor import tool_executor_node
 from agent.nodes.guide import guide_generation_node
 from agent.nodes.reflection import reflection_node
+from agent.nodes.simple_react import simple_llm_node
+from agent.nodes.simple_executor import simple_tool_executor
 
 __all__ = [
     "llm_router_node",
@@ -14,5 +16,7 @@ __all__ = [
     "recommend_tool_node",
     "tool_executor_node",
     "guide_generation_node",
-    "reflection_node"
+    "reflection_node",
+    "simple_llm_node",
+    "simple_tool_executor"
 ]

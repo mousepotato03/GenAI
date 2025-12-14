@@ -29,6 +29,10 @@ class AgentState(TypedDict):
     current_task_idx: int                # 현재 처리 중인 태스크 인덱스
     tool_call_count: int                 # ReAct 루프 카운터 (무한 방지)
 
+    # === 단순 질문 ReAct 필드 ===
+    simple_tool_count: int               # 단순 질문용 도구 호출 카운터
+    final_answer: Optional[str]          # simple_llm_node의 최종 답변
+
     # === 메타데이터 ===
     created_at: str
     error: Optional[str]

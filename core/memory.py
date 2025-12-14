@@ -36,10 +36,10 @@ class MemoryManager:
             'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
         )
 
-        # 컬렉션 초기화
+        # 컬렉션 초기화 (cosine distance 사용으로 유사도 계산 개선)
         self.tools_collection = self.client.get_or_create_collection(
             name="ai_tools",
-            metadata={"description": "AI tools knowledge base"}
+            metadata={"description": "AI tools knowledge base", "hnsw:space": "cosine"}
         )
 
         self.profile_collection = self.client.get_or_create_collection(
@@ -47,10 +47,10 @@ class MemoryManager:
             metadata={"description": "User preferences and history"}
         )
 
-        # PDF 지식베이스 컬렉션
+        # PDF 지식베이스 컬렉션 (cosine distance 사용)
         self.pdf_collection = self.client.get_or_create_collection(
             name="pdf_knowledge",
-            metadata={"description": "PDF documents knowledge base"}
+            metadata={"description": "PDF documents knowledge base", "hnsw:space": "cosine"}
         )
 
     def _embed_text(self, text: str) -> List[float]:
@@ -92,32 +92,35 @@ class MemoryManager:
         ids = []
 
         for idx, tool in enumerate(tools):
-            # 검색용 문서 텍스트 생성
-            features_text = ", ".join(tool.get("features", []))
-            tags_text = ", ".join(tool.get("tags", []))
+            # 새 구조: categories, domains, scores
+            categories = tool.get("categories", [])
+            domains = tool.get("domains", [])
+            scores = tool.get("scores", {})
 
-            doc_text = f"""
-            도구명: {tool['name']}
-            카테고리: {tool['category']}
-            설명: {tool['description']}
-            기능: {features_text}
-            태그: {tags_text}
-            가격: {tool['pricing']}
-            """.strip()
+            categories_text = ", ".join(categories)
+            domains_text = ", ".join(domains)
+            pricing_notes = scores.get("pricing_notes", "")
+            pricing_model = scores.get("pricing_model", "")
+
+            # 검색 키워드와 매칭이 잘 되도록 다양한 표현 포함
+            doc_text = f"""{tool['name']} - {categories_text}
+{tool['description']}
+카테고리: {categories_text}
+적용 분야: {domains_text}
+가격: {pricing_notes}
+{tool['name']}은 {categories_text} 분야의 AI 도구입니다.""".strip()
 
             documents.append(doc_text)
 
             # 메타데이터
             metadatas.append({
                 "name": tool['name'],
-                "category": tool['category'],
                 "description": tool['description'],
-                "pricing": tool['pricing'],
-                "monthly_price": tool.get('monthly_price', 0),
-                "url": tool['url'],
-                "features": features_text,
-                "tags": tags_text,
-                "updated_at": tool.get('updated_at', '')
+                "categories": categories_text,
+                "domains": domains_text,
+                "pricing_model": pricing_model,
+                "pricing_notes": pricing_notes,
+                "scores": json.dumps(scores, ensure_ascii=False)
             })
 
             # ID
@@ -140,7 +143,7 @@ class MemoryManager:
         self,
         query: str,
         k: int = 5,
-        threshold: float = 0.7,
+        threshold: float = 0.4,
         category: Optional[str] = None
     ) -> tuple[List[Dict], bool]:
         """
@@ -162,8 +165,8 @@ class MemoryManager:
         # 쿼리 임베딩
         query_embedding = self._embed_text(query)
 
-        # 카테고리 필터
-        where_filter = {"category": category} if category else None
+        # 카테고리 필터 (categories는 쉼표로 구분된 문자열)
+        where_filter = {"categories": {"$contains": category}} if category else None
 
         # ChromaDB 검색
         results = self.tools_collection.query(
@@ -177,23 +180,22 @@ class MemoryManager:
 
         if results['documents'] and results['documents'][0]:
             for idx, doc in enumerate(results['documents'][0]):
-                # 거리 → 유사도 변환 (ChromaDB는 L2 거리 사용)
+                # 거리 → 유사도 변환 (ChromaDB cosine distance 사용)
                 distance = results['distances'][0][idx] if results['distances'] else 1.0
-                # L2 거리를 유사도로 변환: 1 / (1 + distance)
-                similarity = 1 / (1 + distance)
+                # cosine distance를 유사도로 변환: similarity = 1 - distance
+                # cosine distance 범위: 0 (동일) ~ 2 (반대), 일반적으로 0~1
+                similarity = max(0, 1 - distance)
 
                 metadata = results['metadatas'][0][idx] if results['metadatas'] else {}
 
                 search_results.append({
                     "name": metadata.get("name", "Unknown"),
-                    "category": metadata.get("category", ""),
                     "description": metadata.get("description", ""),
-                    "pricing": metadata.get("pricing", ""),
-                    "monthly_price": metadata.get("monthly_price", 0),
-                    "url": metadata.get("url", ""),
-                    "features": metadata.get("features", ""),
-                    "tags": metadata.get("tags", ""),
-                    "updated_at": metadata.get("updated_at", ""),
+                    "categories": metadata.get("categories", ""),
+                    "domains": metadata.get("domains", ""),
+                    "pricing_model": metadata.get("pricing_model", ""),
+                    "pricing_notes": metadata.get("pricing_notes", ""),
+                    "scores": metadata.get("scores", "{}"),
                     "score": round(similarity, 3)
                 })
 
@@ -482,8 +484,8 @@ class MemoryManager:
         if results['documents'] and results['documents'][0]:
             for idx, doc in enumerate(results['documents'][0]):
                 distance = results['distances'][0][idx] if results['distances'] else 1.0
-                # L2 거리를 유사도로 변환: 1 / (1 + distance)
-                similarity = 1 / (1 + distance)
+                # cosine distance를 유사도로 변환: similarity = 1 - distance
+                similarity = max(0, 1 - distance)
 
                 if similarity >= threshold:
                     metadata = results['metadatas'][0][idx] if results['metadatas'] else {}
@@ -500,6 +502,48 @@ class MemoryManager:
     def get_pdf_count(self) -> int:
         """저장된 PDF 청크 수 반환"""
         return self.pdf_collection.count()
+
+    def search_pdf_for_tool(self, tool_name: str, categories: str, k: int = 3) -> float:
+        """
+        특정 도구에 대한 PDF 관련도 점수 계산
+
+        도구명과 카테고리를 조합한 쿼리로 PDF를 검색하여
+        해당 도구가 최신 트렌드에서 얼마나 언급되는지 점수화
+
+        Args:
+            tool_name: 도구 이름
+            categories: 도구 카테고리 (쉼표 구분 문자열)
+            k: 검색할 PDF 청크 수
+
+        Returns:
+            관련도 점수 (0~1)
+        """
+        # PDF 데이터가 없으면 0 반환
+        if self.pdf_collection.count() == 0:
+            return 0.0
+
+        # 도구명 + 카테고리로 검색 쿼리 구성
+        query = f"{tool_name} {categories}"
+        query_embedding = self._embed_text(query)
+
+        results = self.pdf_collection.query(
+            query_embeddings=[query_embedding],
+            n_results=k
+        )
+
+        if not results['documents'] or not results['documents'][0]:
+            return 0.0
+
+        # 검색 결과의 유사도 점수 평균 계산
+        scores = []
+        for idx, doc in enumerate(results['documents'][0]):
+            distance = results['distances'][0][idx] if results['distances'] else 1.0
+            similarity = max(0, 1 - distance)
+            scores.append(similarity)
+
+        # 평균 점수 반환 (0~1 범위)
+        avg_score = sum(scores) / len(scores) if scores else 0.0
+        return round(avg_score, 3)
 
 
 # 메모리 매니저 싱글톤

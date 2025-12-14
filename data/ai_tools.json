@@ -1,0 +1,1456 @@
+{
+  "tools": [
+    {
+      "name": "Zendesk AI",
+      "description": "AI-enhanced customer support with automated ticket triage and suggested responses.",
+      "categories": [
+        "Customer Support",
+        "AI"
+      ],
+      "domains": [
+        "Support",
+        "Customer Service"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "freemium",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Grammarly",
+      "description": "AI-driven writing assistant for grammar, clarity, and style suggestions.",
+      "categories": [
+        "Writing Assistant",
+        "Productivity",
+        "NLP"
+      ],
+      "domains": [
+        "Content Creation",
+        "Marketing",
+        "Education",
+        "Business Communication"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/grammarly/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.6,
+          "Capterra": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free basic; Premium $15/mo; Business $12.50/mo/user."
+      }
+    },
+    {
+      "name": "Quizlet AI",
+      "description": "AI study assistant generating flashcards, quizzes, and explanations adaptively.",
+      "categories": [
+        "Education",
+        "AI Tutor"
+      ],
+      "domains": [
+        "Education",
+        "Student Learning"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "freemium",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Framer",
+      "description": "Web design platform with AI-powered website building and advanced prototyping tools.",
+      "categories": [
+        "Web Design",
+        "Prototyping",
+        "No-Code"
+      ],
+      "domains": [
+        "Design",
+        "Marketing",
+        "Startups",
+        "Agencies"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.framer.com/pricing/personal"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free starter; Mini $5/mo; Basic $15/mo; Pro $30/mo per site."
+      }
+    },
+    {
+      "name": "Remove.bg",
+      "description": "Instant AI background removal for photos/images via web, API, and apps.",
+      "categories": [
+        "Image Editing",
+        "Productivity",
+        "eCommerce"
+      ],
+      "domains": [
+        "Ecommerce",
+        "Design",
+        "Marketing",
+        "Photography"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.capterra.com/p/10014638/RemoveBG/"
+        ],
+        "user_rating": {
+          "G2": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free limited SD images; paid HD images from $9.99/mo; API pay-per-use."
+      }
+    },
+    {
+      "name": "Grain",
+      "description": "Meeting video highlight and collaboration platform with AI clip generation.",
+      "categories": [
+        "Collaboration",
+        "Video AI"
+      ],
+      "domains": [
+        "Collaboration",
+        "Meetings"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "DeepL",
+      "description": "High-accuracy AI translation for documents and live text, with API support.",
+      "categories": [
+        "Translation",
+        "NLP",
+        "Productivity"
+      ],
+      "domains": [
+        "Localization",
+        "Legal",
+        "Global Business",
+        "Academic"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.getapp.com/website-ecommerce-software/a/deepl-pro/"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free & Pro plans, API $5.99/mo+; advanced enterprise pricing."
+      }
+    },
+    {
+      "name": "Hotjar",
+      "description": "Website analytics platform providing heatmaps, session recordings, and user feedback tools.",
+      "categories": [
+        "Analytics",
+        "User Experience",
+        "Heatmaps"
+      ],
+      "domains": [
+        "UX Design",
+        "Marketing",
+        "E-commerce",
+        "Product Management"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/hotjar/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.3,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free basic plan; Plus $32/mo; Business $80/mo; Scale $171/mo."
+      }
+    },
+    {
+      "name": "Evisort",
+      "description": "Contract management platform with AI-driven clause extraction and analytics.",
+      "categories": [
+        "LegalTech",
+        "Contract Management"
+      ],
+      "domains": [
+        "Legal",
+        "Compliance"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Datadog AI Monitoring",
+      "description": "AI-driven observability platform for metrics, logs, traces, and anomaly detection.",
+      "categories": [
+        "Observability",
+        "Monitoring",
+        "AI Operations"
+      ],
+      "domains": [
+        "IT Operations",
+        "DevOps",
+        "Infrastructure"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/datadog/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Infrastructure $15/host; APM $31/host; Logs $1.27/million events."
+      }
+    },
+    {
+      "name": "Guru",
+      "description": "AI knowledge management assistant providing contextual answers within workflow.",
+      "categories": [
+        "Knowledge Management",
+        "AI"
+      ],
+      "domains": [
+        "Knowledge",
+        "Enterprise"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Looker Studio AI",
+      "description": "AI features integrated into Looker Studio for automated report generation.",
+      "categories": [
+        "BI",
+        "Reporting",
+        "Analytics"
+      ],
+      "domains": [
+        "Marketing",
+        "Data Analytics",
+        "Finance"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://support.google.com/looker-studio"
+        ],
+        "user_rating": {
+          "G2": 4.3
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "free",
+        "pricing_notes": "Free with Google account."
+      }
+    },
+    {
+      "name": "Supabase",
+      "description": "Open-source backend-as-a-service providing PostgreSQL database, authentication, and real-time features.",
+      "categories": [
+        "Backend-as-a-Service",
+        "Database",
+        "Authentication"
+      ],
+      "domains": [
+        "Web Development",
+        "Mobile Apps",
+        "Startups",
+        "Full-Stack Development"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://uibakery.io/blog/supabase-pricing"
+        ],
+        "user_rating": {
+          "G2": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free tier generous; Pro $25/mo per project; Team $599/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Zapier",
+      "description": "Automates repetitive digital workflows by connecting thousands of web apps.",
+      "categories": [
+        "Workflow Automation",
+        "Integration",
+        "Productivity"
+      ],
+      "domains": [
+        "Operations",
+        "Marketing",
+        "IT",
+        "Sales"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.capterra.com/p/130182/Zapier/pricing/"
+        ],
+        "user_rating": {
+          "G2": 4.7,
+          "Capterra": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for 100 tasks/mo; Pro from $19.99/mo; Team/Enterprise options."
+      }
+    },
+    {
+      "name": "Typeform",
+      "description": "Interactive form builder with conversational interfaces and advanced logic branching.",
+      "categories": [
+        "Forms",
+        "Surveys",
+        "Lead Generation"
+      ],
+      "domains": [
+        "Marketing",
+        "Customer Research",
+        "HR",
+        "Education"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/typeform/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free plan limited; Basic $25/mo; Plus $50/mo; Business $83/mo."
+      }
+    },
+    {
+      "name": "Adobe Firefly 3D",
+      "description": "AI-powered 3D asset creation tool integrated into Adobe Creative Cloud.",
+      "categories": [
+        "Design",
+        "3D",
+        "AI"
+      ],
+      "domains": [
+        "Knowledge",
+        "Enterprise"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Vercel",
+      "description": "Frontend deployment platform with AI-powered development tools and edge computing.",
+      "categories": [
+        "Deployment",
+        "Frontend Platform",
+        "AI Infrastructure"
+      ],
+      "domains": [
+        "Web Development",
+        "AI Applications",
+        "Startups",
+        "Enterprise"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://vercel.com/solutions/ai-apps"
+        ],
+        "user_rating": {
+          "G2": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free hobby tier; Pro $20/user/mo; Team $40/user/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Retool",
+      "description": "Low-code platform for building internal tools with AI-powered automations and database connections.",
+      "categories": [
+        "Low-Code",
+        "Internal Tools",
+        "Business Applications"
+      ],
+      "domains": [
+        "Operations",
+        "IT",
+        "Data Analysis",
+        "Enterprise"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://retool.com/ai"
+        ],
+        "user_rating": {
+          "G2": 4.8
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for personal use; Team $10/user/mo; Business $50/user/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Midjourney",
+      "description": "AI image generation from natural language prompts for art and design.",
+      "categories": [
+        "Image Generation",
+        "Creativity",
+        "Design"
+      ],
+      "domains": [
+        "Marketing",
+        "Art",
+        "Entertainment",
+        "Game Design"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://yourdreamai.com/midjourney-pricing-plans/"
+        ],
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Plans: Basic $10/mo, Standard $30/mo, Pro $60/mo, Mega $120/mo. No free tier."
+      }
+    },
+    {
+      "name": "Claude AI",
+      "description": "AI assistant for safe, reliable generative text, supporting reasoning tasks.",
+      "categories": [
+        "Language Model",
+        "Productivity",
+        "Research"
+      ],
+      "domains": [
+        "General Purpose",
+        "Enterprise",
+        "Education",
+        "Healthcare"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://claudelog.com/faqs/how-much-does-claude-ai-cost/"
+        ],
+        "user_rating": {
+          "G2": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free plan; Pro $20/mo individual; Team $25/mo/user."
+      }
+    },
+    {
+      "name": "Slack",
+      "description": "Team collaboration platform with AI-powered message summarization and workflows.",
+      "categories": [
+        "Collaboration",
+        "Messaging",
+        "Automation"
+      ],
+      "domains": [
+        "Corporate",
+        "Remote Work",
+        "Customer Support",
+        "Marketing"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://growthnatives.com/blogs/thought-leadership/hubspot-ai-roadmap-future-developments-and-features/"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free limited; Pro $6.67/mo; Business+ $12.50/mo; Enterprise Grid custom."
+      }
+    },
+    {
+      "name": "Smartsheet",
+      "description": "Spreadsheet-like platform with AI-driven workflows and content suggestions.",
+      "categories": [
+        "Work Management",
+        "Automation",
+        "Collaboration"
+      ],
+      "domains": [
+        "Project Management",
+        "Finance",
+        "Operations",
+        "Construction"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.smartsheet.com/platform/features/ai"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Pro $7/mo; Business $25/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Intercom",
+      "description": "Customer messaging platform combining live chat, help desk, and marketing automation.",
+      "categories": [
+        "Customer Support",
+        "Live Chat",
+        "Marketing Automation"
+      ],
+      "domains": [
+        "SaaS",
+        "Customer Success",
+        "Sales",
+        "Support Teams"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/intercom/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Essential $39/mo; Advanced $99/mo; Expert $139/mo; plus per-seat pricing."
+      }
+    },
+    {
+      "name": "Snyk AI",
+      "description": "Security platform with AI-assisted vulnerability detection and remediation guidance.",
+      "categories": [
+        "Security",
+        "DevSecOps",
+        "AI Assistant"
+      ],
+      "domains": [
+        "Software Development",
+        "Security",
+        "DevOps"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/snyk/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for 200 tests/mo; Team $59/user/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Linear",
+      "description": "Modern project management and issue tracking platform designed for software teams.",
+      "categories": [
+        "Project Management",
+        "Issue Tracking",
+        "Team Collaboration"
+      ],
+      "domains": [
+        "Software Development",
+        "Product Management",
+        "Startups",
+        "Engineering"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.siit.io/tools/trending/linear-app-review"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Product Hunt": 4.9
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for small teams; Standard $8/user/mo; Plus $14/user/mo."
+      }
+    },
+    {
+      "name": "Fathom",
+      "description": "AI-powered Zoom meeting assistant that captures highlights and notes.",
+      "categories": [
+        "Meeting Assistant",
+        "Transcription",
+        "Productivity"
+      ],
+      "domains": [
+        "Sales",
+        "Customer Success",
+        "Consulting",
+        "Remote Teams"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.bluedothq.com/blog/fathom-review"
+        ],
+        "user_rating": {
+          "G2": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free basic; Pro $14/mo; Team custom pricing."
+      }
+    },
+    {
+      "name": "Figma",
+      "description": "Collaborative design tool with AI plugins for auto-layout and content.",
+      "categories": [
+        "UI Design",
+        "Collaboration",
+        "Prototyping"
+      ],
+      "domains": [
+        "Product Design",
+        "Marketing",
+        "UX/UI",
+        "Education"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://explodingtopics.com/blog/most-popular-ai-tools"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free starter; Professional $12/mo/editor; Organization $45/mo/editor."
+      }
+    },
+    {
+      "name": "Autodesk Generative Design",
+      "description": "AI-driven CAD tool that generates optimized design alternatives based on constraints.",
+      "categories": [
+        "Design",
+        "3D",
+        "AI"
+      ],
+      "domains": [
+        "Engineering",
+        "Manufacturing"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Stripe",
+      "description": "Payment processing platform with APIs for online transactions, subscriptions, and marketplaces.",
+      "categories": [
+        "Payment Processing",
+        "Financial Infrastructure",
+        "APIs"
+      ],
+      "domains": [
+        "E-commerce",
+        "SaaS",
+        "Fintech",
+        "Online Business"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/stripe/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.6,
+          "Capterra": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "usage-based",
+        "pricing_notes": "2.9% + 30¢ per transaction; volume discounts available; subscription billing additional."
+      }
+    },
+    {
+      "name": "Perplexity AI",
+      "description": "AI-powered research & report generator with web search and citations.",
+      "categories": [
+        "Research Assistant",
+        "Productivity",
+        "Knowledge Work"
+      ],
+      "domains": [
+        "General Purpose",
+        "Education",
+        "Business Analytics"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://techbuilder.ai/what-is-perplexity-ai-a-complete-breakdown-of-features-pricing-benefits/"
+        ],
+        "user_rating": {
+          "G2": 4.8
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free with Pro at $20/mo includes premium models, image/file search, API."
+      }
+    },
+    {
+      "name": "Calendly",
+      "description": "Automated scheduling platform that eliminates back-and-forth email coordination.",
+      "categories": [
+        "Scheduling",
+        "Productivity",
+        "Calendar Management"
+      ],
+      "domains": [
+        "Sales",
+        "Consulting",
+        "Customer Success",
+        "Professional Services"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/calendly/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.7,
+          "Capterra": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for basic use; Standard $8/user/mo; Teams $12/user/mo; Enterprise $16/user/mo."
+      }
+    },
+    {
+      "name": "Bubble",
+      "description": "No-code platform for building complete web applications with visual programming interface.",
+      "categories": [
+        "No-Code",
+        "Web Development",
+        "Visual Programming"
+      ],
+      "domains": [
+        "Startups",
+        "MVPs",
+        "SaaS",
+        "Small Business"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.sommo.io/blog/why-use-bubble-no-code-platform-for-your-project"
+        ],
+        "user_rating": {
+          "G2": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free plan available; Starter $29/mo; Growth $119/mo; Team $349/mo."
+      }
+    },
+    {
+      "name": "Freshdesk Freddy",
+      "description": "AI assistant for Freshdesk automating ticket classification and reply suggestions.",
+      "categories": [
+        "Customer Support",
+        "AI"
+      ],
+      "domains": [
+        "Support",
+        "Customer Service"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Siemens Xcelerator AI",
+      "description": "Industrial AI platform for digital twin creation and predictive maintenance.",
+      "categories": [
+        "Industry 4.0",
+        "IoT",
+        "AI"
+      ],
+      "domains": [
+        "Engineering",
+        "Manufacturing"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "freemium",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Mailchimp",
+      "description": "Email marketing automation platform with audience segmentation and campaign analytics.",
+      "categories": [
+        "Email Marketing",
+        "Marketing Automation",
+        "CRM"
+      ],
+      "domains": [
+        "Small Business",
+        "E-commerce",
+        "Marketing",
+        "Content Creation"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/mailchimp/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.3,
+          "Capterra": 4.2
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free up to 2,000 contacts; Essentials $13/mo; Standard $20/mo; Premium $350/mo."
+      }
+    },
+    {
+      "name": "Notion AI",
+      "description": "All-in-one workspace with AI writing, summarization, and project management.",
+      "categories": [
+        "Note-Taking",
+        "Productivity",
+        "Knowledge Management"
+      ],
+      "domains": [
+        "Teams",
+        "Startups",
+        "Education",
+        "Remote Work"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.usemotion.com/blog/ai-productivity-tools.html"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Base free; AI add-on $8/mo/user; Pro $10/mo/user."
+      }
+    },
+    {
+      "name": "PathAI",
+      "description": "AI pathology platform for diagnostic image analysis and biomarker discovery.",
+      "categories": [
+        "Industry 4.0",
+        "IoT",
+        "AI"
+      ],
+      "domains": [
+        "Healthcare",
+        "Research"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "freemium",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "RunwayML",
+      "description": "AI-powered video generation platform for creating videos from text and images.",
+      "categories": [
+        "Video Generation",
+        "AI Creation",
+        "Media Production"
+      ],
+      "domains": [
+        "Marketing",
+        "Entertainment",
+        "Social Media",
+        "Creative Industries"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://runwayml.com/research/introducing-runway-gen-4"
+        ],
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Gen-4 models; usage-based pricing; Professional and Enterprise tiers available."
+      }
+    },
+    {
+      "name": "Otter.ai",
+      "description": "AI meeting transcription and summarization with live captioning.",
+      "categories": [
+        "Transcription",
+        "Collaboration",
+        "Productivity"
+      ],
+      "domains": [
+        "Meetings",
+        "Journalism",
+        "Education",
+        "Research"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.tanka.ai/blog/posts/ai-meeting-summary"
+        ],
+        "user_rating": {
+          "G2": 4.5,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free 600 min/mo; Pro $8.33/mo; Business $20/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "HireVue AI Interviews",
+      "description": "AI video interviews with automated candidate evaluation using facial and voice analysis.",
+      "categories": [
+        "AI HR",
+        "Recruitment"
+      ],
+      "domains": [
+        "HR",
+        "Recruitment"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "freemium",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Shopify",
+      "description": "E-commerce platform providing online store creation, payment processing, and inventory management.",
+      "categories": [
+        "E-commerce",
+        "Online Store",
+        "Payment Processing"
+      ],
+      "domains": [
+        "Retail",
+        "Small Business",
+        "Dropshipping",
+        "Enterprise Commerce"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/shopify/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.4,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Basic $39/mo; Shopify $105/mo; Advanced $399/mo; Plus $2,000/mo."
+      }
+    },
+    {
+      "name": "Cursor AI",
+      "description": "AI-powered code editor with intelligent autocomplete, chat-based help, and multi-file context.",
+      "categories": [
+        "Code Editor",
+        "AI Assistant",
+        "Developer Tools"
+      ],
+      "domains": [
+        "Software Development",
+        "Engineering",
+        "Full-Stack Development"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://uibakery.io/blog/cursor-ai-pricing-explained"
+        ],
+        "user_rating": {
+          "G2": 4.8
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free Hobby plan; Pro $20/mo; Ultra $200/mo; Teams $40/user/mo."
+      }
+    },
+    {
+      "name": "ChatGPT",
+      "description": "Conversational AI for text generation, summarization, and code assistance.",
+      "categories": [
+        "Language Model",
+        "Productivity",
+        "Research"
+      ],
+      "domains": [
+        "General Purpose",
+        "Education",
+        "Customer Support",
+        "Development"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://platform.openai.com/docs/pricing"
+        ],
+        "user_rating": {
+          "G2": 4.8
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free basic; Plus $20/mo; API pay-as-you-go from $0.50/1M tokens (GPT-3.5), $30/1M tokens (GPT-4)."
+      }
+    },
+    {
+      "name": "Loom",
+      "description": "Video messaging platform for screen recording, sharing, and asynchronous communication.",
+      "categories": [
+        "Video Communication",
+        "Screen Recording",
+        "Collaboration"
+      ],
+      "domains": [
+        "Remote Work",
+        "Customer Support",
+        "Sales",
+        "Education"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.atlassian.com/software/loom"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for personal use; Business $8/user/mo; Enterprise custom pricing."
+      }
+    },
+    {
+      "name": "Khanmigo",
+      "description": "AI tutor by Khan Academy providing step-by-step guidance and hints.",
+      "categories": [
+        "Education",
+        "AI Tutor"
+      ],
+      "domains": [
+        "Education",
+        "Student Learning"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "Buffer",
+      "description": "Social media management platform for scheduling, publishing, and analyzing social content.",
+      "categories": [
+        "Social Media",
+        "Content Management",
+        "Marketing"
+      ],
+      "domains": [
+        "Marketing",
+        "Small Business",
+        "Content Creation",
+        "Social Media Management"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/buffer/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.3,
+          "Capterra": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for 3 channels; Essentials $6/mo; Team $12/mo; Agency $120/mo."
+      }
+    },
+    {
+      "name": "Monday.com",
+      "description": "Work OS platform with AI workflow builder and data visualization.",
+      "categories": [
+        "Work Management",
+        "Automation",
+        "Collaboration"
+      ],
+      "domains": [
+        "Project Management",
+        "Operations",
+        "IT",
+        "Marketing"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://thedigitalprojectmanager.com/tools/monday-review/"
+        ],
+        "user_rating": {
+          "G2": 4.6,
+          "Capterra": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Basic $8/mo; Standard $10/mo; Pro $16/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Miro",
+      "description": "Online collaborative whiteboard platform for visual collaboration and brainstorming.",
+      "categories": [
+        "Collaboration",
+        "Whiteboarding",
+        "Visual Thinking"
+      ],
+      "domains": [
+        "Design",
+        "Product Management",
+        "Agile",
+        "Remote Teams"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/miro/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.8,
+          "Capterra": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for 3 boards; Starter $8/user/mo; Business $16/user/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Tableau AI",
+      "description": "AI-driven analytics and visualization integrated into Tableau dashboards.",
+      "categories": [
+        "Data Visualization",
+        "Analytics",
+        "BI"
+      ],
+      "domains": [
+        "Data Science",
+        "Marketing",
+        "Sales",
+        "Finance"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/tableau/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "paid",
+        "pricing_notes": "Creator $70/user/mo; Explorer $42/user/mo; Viewer $15/user/mo."
+      }
+    },
+    {
+      "name": "Luminance",
+      "description": "AI legal review tool identifying risks and key clauses in contracts.",
+      "categories": [
+        "LegalTech",
+        "Contract Management"
+      ],
+      "domains": [
+        "Legal",
+        "Compliance"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "GitHub Copilot",
+      "description": "AI coding assistant for faster code, completion, and in-context help.",
+      "categories": [
+        "Coding Assistant",
+        "Developer Tools",
+        "Automation"
+      ],
+      "domains": [
+        "Software Development",
+        "Engineering",
+        "DevOps"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://docs.github.com/en/copilot/get-started/plans"
+        ],
+        "user_rating": {
+          "G2": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for students/os; Pro $10/mo, Pro+ $39/mo, business plans available."
+      }
+    },
+    {
+      "name": "Pymetrics",
+      "description": "Neuroscience-based games for talent matching augmented by AI insights.",
+      "categories": [
+        "AI HR",
+        "Recruitment"
+      ],
+      "domains": [
+        "HR",
+        "Recruitment"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "HubSpot",
+      "description": "CRM platform with AI features for marketing, sales, and service automation.",
+      "categories": [
+        "CRM",
+        "Marketing Automation",
+        "Sales"
+      ],
+      "domains": [
+        "Sales",
+        "Marketing",
+        "Customer Service",
+        "SMB"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.streamcreative.com/2025-test-podcasts/hubspot-ai-examples-features-pricing-2025-2025-blog-test"
+        ],
+        "user_rating": {
+          "G2": 4.6,
+          "Capterra": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free CRM; Starter $50/mo; Professional $800/mo; Enterprise $3,200/mo."
+      }
+    },
+    {
+      "name": "IBM Watson Health",
+      "description": "Healthcare AI platform for clinical decision support and research insights.",
+      "categories": [
+        "Industry 4.0",
+        "IoT",
+        "AI"
+      ],
+      "domains": [
+        "Healthcare",
+        "Research"
+      ],
+      "scores": {
+        "user_rating": {},
+        "last_updated": "2025-08-21",
+        "pricing_model": "paid",
+        "pricing_notes": "Details on website"
+      }
+    },
+    {
+      "name": "InVideo",
+      "description": "AI-powered video creation platform with templates and text-to-video.",
+      "categories": [
+        "Video Editing",
+        "Content Creation",
+        "Marketing"
+      ],
+      "domains": [
+        "Social Media",
+        "Advertising",
+        "Education",
+        "Small Business"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://zapier.com/blog/best-ai-video-generator/"
+        ],
+        "user_rating": {
+          "G2": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free limited; Business $30/mo; Unlimited $60/mo."
+      }
+    },
+    {
+      "name": "Power BI Copilot",
+      "description": "AI assistant for Power BI enabling natural language queries and insights.",
+      "categories": [
+        "Business Intelligence",
+        "Analytics",
+        "AI Assistant"
+      ],
+      "domains": [
+        "Business Intelligence",
+        "Enterprise",
+        "Data Analysis"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/power-bi/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.4
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free desktop; Pro $9.99/user/mo; Premium per capacity."
+      }
+    },
+    {
+      "name": "Airtable",
+      "description": "Flexible no-code database with AI-powered automations and interfaces.",
+      "categories": [
+        "Database",
+        "Automation",
+        "No-Code"
+      ],
+      "domains": [
+        "Operations",
+        "Marketing",
+        "Product Management",
+        "HR"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.zendesk.kr/service/wfm/workflow-automation-software/"
+        ],
+        "user_rating": {
+          "G2": 4.7,
+          "Capterra": 4.6
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free tier; Plus $10/mo; Pro $20/mo; Enterprise custom."
+      }
+    },
+    {
+      "name": "Canva",
+      "description": "User-friendly AI-powered design platform for image, video, and document creation.",
+      "categories": [
+        "Design",
+        "Creativity",
+        "Marketing"
+      ],
+      "domains": [
+        "Marketing",
+        "Education",
+        "Social Media",
+        "Small Business"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.shopify.com/blog/how-to-use-canva-ai"
+        ],
+        "user_rating": {
+          "G2": 4.7
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free tier available; Pro $14/mo/user; advanced AI tools in Magic Studio."
+      }
+    },
+    {
+      "name": "Twilio",
+      "description": "Cloud communications platform providing SMS, voice, video, and email APIs for developers.",
+      "categories": [
+        "Communications",
+        "APIs",
+        "Cloud Platform"
+      ],
+      "domains": [
+        "Software Development",
+        "Customer Engagement",
+        "Healthcare",
+        "Finance"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/twilio/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.4,
+          "Capterra": 4.3
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "usage-based",
+        "pricing_notes": "Pay-as-you-go pricing; SMS from $0.0075/message; Voice from $0.0085/minute."
+      }
+    },
+    {
+      "name": "Webflow",
+      "description": "Visual web design platform combining design freedom with CMS and hosting capabilities.",
+      "categories": [
+        "Web Design",
+        "CMS",
+        "No-Code"
+      ],
+      "domains": [
+        "Design",
+        "Marketing",
+        "Agencies",
+        "Small Business"
+      ],
+      "scores": {
+        "source_urls": [
+          "https://www.g2.com/products/webflow/reviews"
+        ],
+        "user_rating": {
+          "G2": 4.4,
+          "Capterra": 4.5
+        },
+        "last_updated": "2025-08-22",
+        "pricing_model": "freemium",
+        "pricing_notes": "Free for personal projects; Basic $18/mo; CMS $29/mo; Business $49/mo."
+      }
+    }
+  ]
+}
