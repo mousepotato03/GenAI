@@ -13,6 +13,7 @@ from agent.state import AgentState
 from agent.nodes import (
     llm_router_node,
     planning_node,
+    human_approval_node,
     recommend_tool_node,
     tool_executor_node,
     guide_generation_node,
@@ -53,6 +54,7 @@ def create_agent_graph():
     # ===== 노드 추가 =====
     workflow.add_node("llm_router", llm_router_node)
     workflow.add_node("planning_node", planning_node)
+    workflow.add_node("human_approval_node", human_approval_node)
     workflow.add_node("recommend_tool_node", recommend_tool_node)
     workflow.add_node("tool_executor", tool_executor_node)
     workflow.add_node("guide_generation_node", guide_generation_node)
@@ -71,8 +73,9 @@ def create_agent_graph():
         }
     )
 
-    # ===== planning -> recommend (interrupt 전) =====
-    workflow.add_edge("planning_node", "recommend_tool_node")
+    # ===== planning -> human_approval -> recommend =====
+    workflow.add_edge("planning_node", "human_approval_node")
+    workflow.add_edge("human_approval_node", "recommend_tool_node")
 
     # ===== ReAct 루프 =====
     workflow.add_conditional_edges(
@@ -97,7 +100,7 @@ def create_agent_graph():
 
     graph = workflow.compile(
         checkpointer=checkpointer,
-        interrupt_before=["recommend_tool_node"]  # planning 후 interrupt
+        interrupt_before=["human_approval_node"]  # planning 후 interrupt (ReAct 루프에 영향 없음)
     )
 
     return graph

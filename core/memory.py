@@ -155,6 +155,10 @@ class MemoryManager:
         Returns:
             (검색 결과 리스트, fallback 필요 여부)
         """
+        # 도구 데이터가 없으면 빈 리스트 반환 (HNSW 오류 방지)
+        if self.tools_collection.count() == 0:
+            return [], True
+
         # 쿼리 임베딩
         query_embedding = self._embed_text(query)
 

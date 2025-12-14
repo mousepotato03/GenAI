@@ -48,6 +48,18 @@ def tool_executor_node(state: AgentState) -> Dict:
                 if isinstance(docs, list):
                     retrieved_docs.extend(docs)
                     print(f"  - retrieved_docs에 {len(docs)}개 추가")
+
+                    # 유사도 점수 출력
+                    print(f"  - [유사도 점수]")
+                    for doc in docs:
+                        score = doc.get("score", 0)
+                        name = doc.get("name", doc.get("content", "")[:30])
+                        doc_type = doc.get("type", "unknown")
+                        print(f"    • {name}: {score:.4f} ({doc_type})")
+
+                    # should_fallback 상태 출력
+                    should_fallback = result_data.get("should_fallback", False)
+                    print(f"  - should_fallback: {should_fallback} (threshold 미달 여부)")
             except:
                 pass
 
