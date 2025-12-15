@@ -10,6 +10,7 @@ from agent.state import AgentState
 from core.llm import get_llm
 from core.memory import get_memory_manager
 from prompts.reflection import MEMORY_EXTRACTOR_SYSTEM_PROMPT, MEMORY_EXTRACTOR_USER_TEMPLATE
+from core.utils import extract_json # <-- 추가
 
 
 def reflection_node(state: AgentState) -> Dict:
@@ -42,11 +43,8 @@ def reflection_node(state: AgentState) -> Dict:
             HumanMessage(content=user_prompt)
         ])
 
-        response_text = response.content.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0]
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].split("```")[0]
+        # 개선 코드: extract_json을 사용하여 JSON 텍스트 추출
+        response_text = extract_json(response.content)
 
         new_preferences = json.loads(response_text)
 
