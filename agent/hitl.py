@@ -12,6 +12,7 @@ from prompts.intent import (
     INTENT_ANALYSIS_SYSTEM_PROMPT, INTENT_ANALYSIS_USER_TEMPLATE,
     MODIFY_PLAN_SYSTEM_PROMPT, MODIFY_PLAN_USER_TEMPLATE
 )
+from core.utils import extract_json # <-- 추가
 
 
 def analyze_user_intent(user_text: str, plan_summary: str) -> dict:
@@ -29,11 +30,8 @@ def analyze_user_intent(user_text: str, plan_summary: str) -> dict:
     ])
 
     try:
-        response_text = response.content.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0]
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].split("```")[0]
+        # 개선 코드: extract_json을 사용하여 JSON 텍스트 추출
+        response_text = extract_json(response.content)
 
         result = json.loads(response_text)
         return {
@@ -62,11 +60,8 @@ def modify_subtasks(current_subtasks: List[str], feedback: str) -> List[str]:
     ])
 
     try:
-        response_text = response.content.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0]
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].split("```")[0]
+        # 개선 코드: extract_json을 사용하여 JSON 텍스트 추출
+        response_text = extract_json(response.content)
 
         modified_tasks = json.loads(response_text)
 
