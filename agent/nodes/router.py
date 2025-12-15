@@ -11,6 +11,7 @@ from core.llm import get_llm
 from core.memory import get_memory_manager
 from prompts.router import LLM_ROUTER_SYSTEM_PROMPT, LLM_ROUTER_USER_TEMPLATE
 from prompts.formatters import format_user_profile
+from core.utils import extract_json # <-- 수정: parse_json_safely 대신 extract_json 사용
 
 
 def llm_router_node(state: AgentState) -> Dict:
@@ -40,17 +41,11 @@ def llm_router_node(state: AgentState) -> Dict:
     ])
 
     try:
-        response_text = response.content.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0]
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].split("```")[0]
-
+        # 개선 코드: extract_json을 사용하여 JSON 텍스트 추출 후, json.loads로 로드
+        response_text = extract_json(response.content)
         result = json.loads(response_text)
-        is_complex = result.get("is_complex", False)
+        is_complex = result.get("is_complex", True)
         reason = result.get("reason", "")
-        print(f"  - 분류 결과: {'복잡한 작업' if is_complex else '단순 Q&A'}")
-        print(f"  - 이유: {reason}")
     except Exception as e:
         print(f"  - 분류 파싱 오류: {e}, 기본값: 복잡한 작업")
         is_complex = True
