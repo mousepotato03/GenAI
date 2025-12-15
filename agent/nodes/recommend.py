@@ -30,6 +30,32 @@ def recommend_tool_node(state: AgentState) -> Dict:
     retrieved_docs = state.get("retrieved_docs", [])
     user_profile = state.get("user_profile")
 
+    # 이전 태스크 완료 처리 (executor에서 task_completed=True 설정한 경우)
+    if state.get("task_completed", False):
+        task_id = f"task_{current_idx + 1}"
+        print(f"  - 이전 태스크 완료 처리: {task_id}")
+
+        # 마지막 검색 결과에서 추천 도구 정보 추출
+        if retrieved_docs:
+            last_doc = retrieved_docs[-1]
+            tool_name = last_doc.get("name", "알 수 없음")
+            description = last_doc.get("description", "")
+            scores = last_doc.get("scores", {})
+            final_score = scores.get("final_score", 0)
+
+            recommendation = f"**{tool_name}** (점수: {final_score:.2f})\n{description}"
+            print(f"  - 추천 저장: {tool_name}")
+        else:
+            recommendation = "검색 결과 기반 추천"
+
+        tool_recommendations[task_id] = recommendation
+
+        return {
+            "tool_recommendations": tool_recommendations,
+            "current_task_idx": current_idx + 1,
+            "task_completed": False  # 플래그 초기화
+        }
+
     # 모든 태스크 완료 체크
     if current_idx >= len(sub_tasks):
         print("  - 모든 서브태스크 처리 완료")

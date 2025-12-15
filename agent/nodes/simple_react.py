@@ -10,7 +10,8 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from agent.state import AgentState
 from core.llm import get_llm
 from core.config import MAX_TOOL_CALLS_PER_TASK
-from tools.calculator import calculate_subscription_cost, check_tool_freshness, get_current_time, calculate_math
+from tools.calculator import calculate_subscription_cost, calculate_math
+from tools.time_tools import check_tool_freshness, get_current_time
 from tools.search import google_search_tool
 from prompts.formatters import format_user_profile
 

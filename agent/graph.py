@@ -3,7 +3,6 @@ Agent Graph - LangGraph 그래프 빌드 및 실행
 """
 import uuid
 from typing import Dict, Optional, List
-from datetime import datetime
 
 from langchain_core.messages import HumanMessage, BaseMessage
 from langgraph.graph import StateGraph, END
@@ -56,9 +55,9 @@ def create_initial_state(
         "plan_analysis": "",
         "current_task_idx": 0,
         "tool_call_count": 0,
+        "task_completed": False,
         "simple_tool_count": 0,
         "final_answer": None,
-        "created_at": datetime.now().isoformat(),
         "error": None
     }
 

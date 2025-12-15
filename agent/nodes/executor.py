@@ -103,12 +103,11 @@ def tool_executor_node(state: AgentState) -> Dict:
             "tool_result": None  # 다음 루프를 위해 초기화
         }
 
-        # should_fallback: False이면 충분한 결과 → 다음 태스크로 이동
+        # should_fallback: False이면 충분한 결과 → 플래그 설정 (recommend에서 idx 증가)
         if task_completed:
-            current_idx = state.get("current_task_idx", 0)
-            result["current_task_idx"] = current_idx + 1
+            result["task_completed"] = True
             result["tool_call_count"] = 0  # 다음 태스크를 위해 초기화
-            print(f"  - 충분한 결과 획득, 다음 태스크로 이동 (idx: {current_idx} → {current_idx + 1})")
+            print(f"  - 충분한 결과 획득, task_completed=True 설정")
 
         return result
 

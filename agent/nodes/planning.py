@@ -73,5 +73,6 @@ def planning_node(state: AgentState) -> Dict:
         "tool_recommendations": {},
         "current_task_idx": 0,
         "tool_call_count": 0,
+        "task_completed": False,
         "messages": [AIMessage(content=plan_message)]
     }

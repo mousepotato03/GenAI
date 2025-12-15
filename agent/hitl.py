@@ -111,6 +111,7 @@ def handle_human_feedback(state: AgentState, user_response: str) -> Dict:
             "user_feedback": feedback,
             "current_task_idx": 0,
             "tool_recommendations": {},
+            "task_completed": False,
             "messages": [AIMessage(content=f"계획이 수정되었습니다:\n" + "\n".join([f"{i+1}. {t}" for i, t in enumerate(modified_tasks)]))]
         }
     else:
