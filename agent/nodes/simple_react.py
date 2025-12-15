@@ -15,22 +15,22 @@ from tools.search import google_search_tool
 from prompts.formatters import format_user_profile
 
 
-SIMPLE_REACT_SYSTEM_PROMPT = """당신은 AI 도구 관련 질문에 답변하는 전문가입니다.
+SIMPLE_REACT_SYSTEM_PROMPT = """당신은 사용자를 돕는 친절한 AI 어시스턴트입니다.
 
-사용자의 간단한 질문에 친절하고 정확하게 답변해주세요.
-필요한 경우 제공된 도구를 활용하여 정보를 수집하세요.
+사용자의 질문에 자연스럽고 도움이 되는 답변을 제공하세요.
+필요한 경우 도구를 활용하여 정확한 정보를 제공할 수 있습니다.
 
 ## 사용 가능한 도구:
-1. get_current_time: 현재 날짜와 시간을 반환합니다.
-2. google_search_tool: Google에서 최신 정보를 검색합니다.
-3. calculate_subscription_cost: AI 도구들의 월간 구독료를 계산합니다.
-4. check_tool_freshness: AI 도구 정보의 최신성을 확인합니다.
+1. get_current_time: 현재 날짜와 시간 확인
+2. google_search_tool: 최신 정보 검색
+3. calculate_subscription_cost: AI 도구 구독료 계산
+4. check_tool_freshness: AI 도구 정보 최신성 확인
 
-## 응답 지침:
-- 최신 정보가 필요한 질문은 먼저 get_current_time으로 현재 날짜를 확인한 후, google_search_tool로 검색하세요.
-- 도구가 필요한 경우에만 도구를 호출하세요.
-- 도구 호출 결과를 바탕으로 최종 답변을 작성하세요.
-- 한국어로 친절하게 답변하세요.
+## 응답 원칙:
+- 대화형 질문(인사, 잡담 등)에는 자연스럽게 응답하세요
+- 최신 정보가 필요하면 도구를 활용하세요
+- 불필요한 도구 호출은 피하세요
+- 항상 친절하고 명확하게 한국어로 답변하세요
 """
 
 
@@ -93,11 +93,13 @@ def simple_llm_node(state: AgentState) -> Dict:
     # 기존 메시지 히스토리 활용
     invoke_messages = [SystemMessage(content=SIMPLE_REACT_SYSTEM_PROMPT)]
 
-    # 이전 메시지가 있으면 추가 (Tool 결과 포함)
-    if len(messages) > 1:  # 첫 HumanMessage 외에 추가 메시지가 있으면
+    # 첫 요청인지 후속 요청인지 구분 (도구 호출 카운트 기준)
+    if simple_tool_count > 0 and len(messages) > 1:
+        # ReAct 루프 중 - 이전 도구 결과를 포함하여 진행
         invoke_messages.extend(messages[1:])  # 첫 메시지 제외하고 추가
         invoke_messages.append(HumanMessage(content="이전 도구 결과를 바탕으로 계속 답변해주세요."))
     else:
+        # 첫 요청 - 사용자 질문 그대로 전달
         invoke_messages.append(HumanMessage(content=user_prompt))
 
     response = llm_with_tools.invoke(invoke_messages)

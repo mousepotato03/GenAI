@@ -52,13 +52,15 @@ def create_gradio_ui(active_sessions: Dict):
             sub_tasks = state.values.get("sub_tasks", [])
             plan_analysis = state.values.get("plan_analysis", "")
             final_guide = state.values.get("final_guide")
+            final_answer = state.values.get("final_answer")
 
             # 히스토리 업데이트
             history.append({"role": "user", "content": message})
 
-            # 단순 Q&A: 바로 응답
-            if not is_complex and final_guide:
-                history.append({"role": "assistant", "content": final_guide})
+            # 단순 Q&A: 바로 응답 (is_complex가 False이면 계획 없이 바로 처리)
+            if not is_complex:
+                response = final_answer or "응답을 생성할 수 없습니다."
+                history.append({"role": "assistant", "content": response})
                 return history, None, "완료!"
 
             # 복잡한 작업: 세션 저장 및 승인 대기
