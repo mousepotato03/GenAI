@@ -10,6 +10,7 @@ from agent.state import AgentState
 from core.llm import get_llm
 from prompts.planning import PLAN_SYSTEM_PROMPT, PLAN_USER_TEMPLATE
 from prompts.formatters import format_user_profile
+from core.utils import extract_json # <-- 추가
 
 
 def planning_node(state: AgentState) -> Dict:
@@ -35,12 +36,9 @@ def planning_node(state: AgentState) -> Dict:
     ])
 
     try:
-        response_text = response.content.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0]
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].split("```")[0]
-
+        # 개선 코드: extract_json을 사용하여 JSON 텍스트 추출
+        response_text = extract_json(response.content)
+        
         plan_data = json.loads(response_text)
         analysis = plan_data.get("analysis", "")
         subtasks_data = plan_data.get("subtasks", [])
