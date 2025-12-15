@@ -2,13 +2,25 @@
 Gradio UI - 채팅 인터페이스
 """
 import uuid
-from typing import Dict
+from typing import Dict, List
 
 import gradio as gr
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 
 from agent.graph import create_agent_graph, create_initial_state
 from agent.hitl import handle_human_feedback
 from core.memory import get_memory_manager
+
+
+def convert_history_to_messages(history: List[Dict]) -> List[BaseMessage]:
+    """Gradio history를 LangGraph messages로 변환 (단기 메모리)"""
+    messages = []
+    for msg in history:
+        if msg["role"] == "user":
+            messages.append(HumanMessage(content=msg["content"]))
+        else:
+            messages.append(AIMessage(content=msg["content"]))
+    return messages
 
 
 def create_gradio_ui(active_sessions: Dict):
@@ -40,8 +52,11 @@ def create_gradio_ui(active_sessions: Dict):
             graph = create_agent_graph()
 
             # 그래프 이동 최대 횟수 지정
-            config = {"recursion_limit": 60, "configurable": {"thread_id": thread_id}}  
-            initial_state = create_initial_state(message, user_id or "gradio_user")
+            config = {"recursion_limit": 60, "configurable": {"thread_id": thread_id}}
+
+            # 이전 대화 히스토리를 messages로 변환 (단기 메모리)
+            chat_history = convert_history_to_messages(history)
+            initial_state = create_initial_state(message, user_id or "gradio_user", chat_history)
 
             # 그래프 실행 (interrupt까지 또는 완료까지)
             for event in graph.stream(initial_state, config):
@@ -178,6 +193,9 @@ def create_gradio_ui(active_sessions: Dict):
                     interactive=False
                 )
 
+                # 새 대화 버튼
+                new_chat_btn = gr.Button("새 대화", variant="secondary")
+
                 gr.Markdown("### 통계")
                 with gr.Row():
                     tools_count = gr.Number(label="등록된 도구", value=0, interactive=False)
@@ -211,6 +229,16 @@ def create_gradio_ui(active_sessions: Dict):
         refresh_btn.click(
             fn=refresh_stats,
             outputs=[tools_count, profiles_count]
+        )
+
+        # 새 대화 버튼 이벤트
+        def clear_chat():
+            """대화 초기화 (새 세션 시작)"""
+            return [], None, "새 대화 시작"
+
+        new_chat_btn.click(
+            fn=clear_chat,
+            outputs=[chatbot, current_thread_id, status_text]
         )
 
         # 초기 로드 시 통계 업데이트

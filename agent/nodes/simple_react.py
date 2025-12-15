@@ -94,7 +94,17 @@ def simple_llm_node(state: AgentState) -> Dict:
 
     # LLM invoke용 메시지 구성
     invoke_messages = [SystemMessage(content=SIMPLE_REACT_SYSTEM_PROMPT)]
-    
+
+    # 이전 대화 히스토리 추가 (단기 메모리) - 마지막 메시지(현재 질문) 제외
+    from langchain_core.messages import AIMessage, ToolMessage
+    history_messages = messages[:-1] if messages else []  # 마지막 HumanMessage 제외
+    for msg in history_messages:
+        # HumanMessage, AIMessage (tool_calls 없는 일반 응답) 포함
+        if isinstance(msg, HumanMessage):
+            invoke_messages.append(msg)
+        elif isinstance(msg, AIMessage) and not (hasattr(msg, 'tool_calls') and msg.tool_calls):
+            invoke_messages.append(msg)
+
     # 첫 요청인 경우
     if simple_tool_count == 0:
         user_prompt = f"""사용자 질문: {user_query}

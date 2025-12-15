@@ -50,8 +50,10 @@ def llm_router_node(state: AgentState) -> Dict:
         print(f"  - 분류 파싱 오류: {e}, 기본값: 복잡한 작업")
         is_complex = True
 
+    print(f"  - 분류 결과: {'복잡한 작업' if is_complex else '단순 Q&A'}")
+
+    # messages는 반환하지 않음 (add_messages가 기존 messages를 유지)
     return {
         "is_complex_task": is_complex,
-        "user_profile": user_profile,
-        "messages": [AIMessage(content=f"[시스템] 질문 유형: {'복잡한 작업' if is_complex else '단순 Q&A'}")]
+        "user_profile": user_profile
     }

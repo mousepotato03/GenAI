@@ -2,10 +2,10 @@
 Agent Graph - LangGraph 그래프 빌드 및 실행
 """
 import uuid
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from datetime import datetime
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, BaseMessage
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -25,10 +25,24 @@ from agent.routing import route_after_llm_router, route_after_recommend, route_a
 from agent.hitl import handle_human_feedback
 
 
-def create_initial_state(user_query: str, user_id: str = "default_user") -> AgentState:
-    """초기 상태 생성"""
+def create_initial_state(
+    user_query: str,
+    user_id: str = "default_user",
+    chat_history: List[BaseMessage] = None
+) -> AgentState:
+    """초기 상태 생성
+
+    Args:
+        user_query: 현재 사용자 질문
+        user_id: 사용자 ID
+        chat_history: 이전 대화 히스토리 (단기 메모리)
+    """
+    # 이전 대화 히스토리 + 새 질문
+    messages = list(chat_history) if chat_history else []
+    messages.append(HumanMessage(content=user_query))
+
     return {
-        "messages": [HumanMessage(content=user_query)],
+        "messages": messages,
         "tool_result": None,
         "is_complex_task": False,
         "sub_tasks": [],
