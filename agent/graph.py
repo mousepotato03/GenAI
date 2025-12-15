@@ -1,5 +1,5 @@
 """
-Agent Graph - LangGraph 그래프 빌드 및 실행
+Agent Graph - LangGraph 메인 그래프 (서브그래프 구조)
 """
 import uuid
 from typing import Dict, Optional
@@ -10,18 +10,9 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
 from agent.state import AgentState
-from agent.nodes import (
-    llm_router_node,
-    planning_node,
-    human_approval_node,
-    recommend_tool_node,
-    tool_executor_node,
-    guide_generation_node,
-    reflection_node,
-    simple_llm_node,
-    simple_tool_executor
-)
-from agent.routing import route_after_llm_router, route_after_recommend, route_after_simple_llm
+from agent.nodes import llm_router_node, reflection_node
+from agent.subgraphs import create_simple_subgraph, create_complex_subgraph
+from agent.routing import route_after_llm_router
 from agent.hitl import handle_human_feedback
 
 
@@ -50,77 +41,45 @@ def create_initial_state(user_query: str, user_id: str = "default_user") -> Agen
 
 
 def create_agent_graph():
-    """LangGraph 에이전트 그래프 생성"""
+    """LangGraph 메인 그래프 생성 (서브그래프 구조)"""
 
-    # 그래프 정의
+    checkpointer = MemorySaver()
+
+    # 서브그래프 생성
+    simple_subgraph = create_simple_subgraph()
+    complex_subgraph = create_complex_subgraph(checkpointer=checkpointer)
+
+    # 메인 그래프 정의
     workflow = StateGraph(AgentState)
 
     # ===== 노드 추가 =====
     workflow.add_node("llm_router", llm_router_node)
-    workflow.add_node("planning_node", planning_node)
-    workflow.add_node("human_approval_node", human_approval_node)
-    workflow.add_node("recommend_tool_node", recommend_tool_node)
-    workflow.add_node("tool_executor", tool_executor_node)
-    workflow.add_node("guide_generation_node", guide_generation_node)
+    workflow.add_node("simple_subgraph", simple_subgraph)
+    workflow.add_node("complex_subgraph", complex_subgraph)
     workflow.add_node("reflection_node", reflection_node)
-
-    # ===== 단순 질문용 ReAct 노드 =====
-    workflow.add_node("simple_llm_node", simple_llm_node)
-    workflow.add_node("simple_executor", simple_tool_executor)
 
     # ===== Entry Point =====
     workflow.set_entry_point("llm_router")
 
-    # ===== llm_router 분기 =====
+    # ===== llm_router 분기 (서브그래프 선택) =====
     workflow.add_conditional_edges(
         "llm_router",
         route_after_llm_router,
         {
-            "planning_node": "planning_node",
-            "simple_llm_node": "simple_llm_node"  # 단순 질문 -> ReAct 패턴
+            "simple_subgraph": "simple_subgraph",
+            "complex_subgraph": "complex_subgraph"
         }
     )
 
-    # ===== 단순 질문 ReAct 루프 =====
-    workflow.add_conditional_edges(
-        "simple_llm_node",
-        route_after_simple_llm,
-        {
-            "simple_executor": "simple_executor",
-            "reflection_node": "reflection_node"
-        }
-    )
-    workflow.add_edge("simple_executor", "simple_llm_node")  # 루프백
-
-    # ===== planning -> human_approval -> recommend =====
-    workflow.add_edge("planning_node", "human_approval_node")
-    workflow.add_edge("human_approval_node", "recommend_tool_node")
-
-    # ===== ReAct 루프 =====
-    workflow.add_conditional_edges(
-        "recommend_tool_node",
-        route_after_recommend,
-        {
-            "tool_executor": "tool_executor",
-            "recommend_tool_node": "recommend_tool_node",
-            "guide_generation_node": "guide_generation_node"
-        }
-    )
-
-    # tool_executor -> recommend_tool_node (Loop back)
-    workflow.add_edge("tool_executor", "recommend_tool_node")
+    # ===== 서브그래프 -> reflection =====
+    workflow.add_edge("simple_subgraph", "reflection_node")
+    workflow.add_edge("complex_subgraph", "reflection_node")
 
     # ===== 마무리 =====
-    workflow.add_edge("guide_generation_node", "reflection_node")
     workflow.add_edge("reflection_node", END)
 
     # ===== 컴파일 =====
-    checkpointer = MemorySaver()
-
-    graph = workflow.compile(
-        checkpointer=checkpointer,
-        interrupt_before=["human_approval_node"]  # planning 후 interrupt (ReAct 루프에 영향 없음)
-    )
+    graph = workflow.compile(checkpointer=checkpointer)
 
     return graph
 
