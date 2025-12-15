@@ -136,3 +136,30 @@ def check_freshness_simple(updated_date: str) -> Dict:
             "days_old": -1,
             "message": "날짜 형식 오류"
         }
+
+
+@tool
+def calculate_math(expression: str) -> str:
+    """
+    간단한 수학 계산을 수행합니다.
+    
+    Args:
+        expression: 계산할 수식 (예: "22 * 34", "100 + 50", "1000 / 4")
+    
+    Returns:
+        계산 결과
+    
+    Examples:
+        - "22 * 34" -> "748"
+        - "100 + 50 - 20" -> "130"
+    """
+    try:
+        # 안전한 계산을 위해 허용된 문자만 사용
+        allowed_chars = set("0123456789+-*/(). ")
+        if not all(c in allowed_chars for c in expression):
+            return "오류: 허용되지 않는 문자가 포함되어 있습니다. 숫자와 +, -, *, /, (, )만 사용 가능합니다."
+        
+        result = eval(expression)
+        return f"{expression} = {result}"
+    except Exception as e:
+        return f"계산 오류: {str(e)}"
